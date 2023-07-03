@@ -3,7 +3,9 @@ import {
     RouterProvider,
     Navigate,
 } from 'react-router-dom';
-import ShareSpace from './components/ShareSpace';
+import SharedSpace from './components/SharedSpace';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const characters =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -30,12 +32,17 @@ const router = createBrowserRouter([
     },
     {
         path: '/:id',
-        element: <ShareSpace />,
+        element: <SharedSpace />,
     },
 ]);
 
 function App() {
-    return <RouterProvider router={router} />;
+    return (
+        <>
+            <RouterProvider router={router} />
+            <ToastContainer />
+        </>
+    );
 }
 
 function Home() {
