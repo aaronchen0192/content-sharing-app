@@ -14,35 +14,39 @@ Globals:
         Tracing: Active
     Api:
         TracingEnabled: true
+        Cors:
+            AllowMethods: "'GET,POST,OPTIONS,PUT,DELETE'"
+            AllowHeaders: "'content-type'"
+            AllowOrigin: "'*'"
 Resources:
-    UploadFunction:
+    GetTextFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
             CodeUri: handler/
-            Handler: upload.lambda_handler
+            Handler: getText.lambda_handler
             Runtime: python3.9
             Architectures:
                 - x86_64
             Events:
-                Upload:
+                GetText:
                     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
                     Properties:
-                        Path: /upload
-                        Method: post
-    RetrieveFunction:
-        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-        Properties:
-            CodeUri: handler/
-            Handler: retrieve.lambda_handler
-            Runtime: python3.9
-            Architectures:
-                - x86_64
-            Events:
-                Retrieve:
-                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-                    Properties:
-                        Path: /retrieve
+                        Path: /text
                         Method: get
+    PostTextFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: handler/
+            Handler: postText.lambda_handler
+            Runtime: python3.9
+            Architectures:
+                - x86_64
+            Events:
+                PostText:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        Path: /text
+                        Method: post
 
 Outputs:
     # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

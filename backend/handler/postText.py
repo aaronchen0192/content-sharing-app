@@ -1,5 +1,5 @@
 import json
-
+from datetime import datetime
 # import requests
 
 
@@ -33,10 +33,20 @@ def lambda_handler(event, context):
 
     #     raise e
 
+    query_params = event['queryStringParameters']
+
+    sid = query_params['sid']
+    text = event['body']
+
+    print(sid)
+    print(text)
+
     return {
         "statusCode": 200,
-        "body": json.dumps({
-            "message": "retrieve",
-            # "location": ip.text.replace("\n", "")
-        }),
+        "headers": {
+            "Access-Control-Allow-Headers" : "Content-Type",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST"
+        },
+        "body": 1000*60 + datetime.now().timestamp() * 1000,
     }

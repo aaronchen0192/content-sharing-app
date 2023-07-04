@@ -1,5 +1,5 @@
 import json
-
+from datetime import datetime
 # import requests
 
 
@@ -33,10 +33,21 @@ def lambda_handler(event, context):
 
     #     raise e
 
+    query_params = event['queryStringParameters']
+
+    sid = query_params['sid']
+
+    print(sid)
+
     return {
         "statusCode": 200,
+        "headers": {
+            "Access-Control-Allow-Headers" : "Content-Type",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET"
+        },
         "body": json.dumps({
-            "message": "arearsd123",
-            # "location": ip.text.replace("\n", "")
+            "value": "123",
+            "expire": 1000*60 + datetime.now().timestamp() * 1000
         }),
     }
