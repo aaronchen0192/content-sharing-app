@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+    localstack:
+        image: localstack/localstack:1.4.0
+        environment:
+            SERVICES: 'dynamodb,lambda'
+            EDGE_PORT: '4566'
+        ports:
+            - '4566:4566'
+        volumes:
+            # - './localstack/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh'
+            - '${LOCALSTACK_VOLUME_DIR:-./localstack/volume}:/var/lib/localstack'
+            - '/var/run/docker.sock:/var/run/docker.sock'

@@ -48,6 +48,25 @@ Resources:
                         Path: /text
                         Method: post
 
+    MyDynamoDBTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+        TableName: RoomTextTable
+        AttributeDefinitions:
+            - AttributeName: sid
+              AttributeType: S
+            - AttributeName: text
+              AttributeType: S
+            - AttributeName: ttl
+              AttributeType: N
+        KeySchema:
+            - AttributeName: sid
+              KeyType: HASH
+        BillingMode: PAY_PER_REQUEST # This indicates on-demand capacity
+        TimeToLiveSpecification: # This specifies the TTL attribute
+            AttributeName: ttl
+            Enabled: true
+
 Outputs:
     # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
     # Find out more about other implicit resources you can reference within SAM
