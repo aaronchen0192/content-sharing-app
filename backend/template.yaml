@@ -33,6 +33,10 @@ Resources:
                     Properties:
                         Path: /text
                         Method: get
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: '*'
+
     PostTextFunction:
         Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
         Properties:
@@ -47,6 +51,9 @@ Resources:
                     Properties:
                         Path: /text
                         Method: post
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: '*'
 
     SharedSpaceDynamoDBTable:
         Type: AWS::DynamoDB::Table
@@ -62,17 +69,3 @@ Resources:
             TimeToLiveSpecification: # This specifies the TTL attribute
                 AttributeName: expire
                 Enabled: true
-
-Outputs:
-    # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-    # Find out more about other implicit resources you can reference within SAM
-    # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-    UploadApi:
-        Description: API Gateway endpoint URL for Prod stage for Content Sharing function
-        Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/'
-    UploadFunction:
-        Description: Content Sharing Lambda Function ARN
-        Value: !GetAtt UploadFunction.Arn
-    UploadFunctionIamRole:
-        Description: Implicit IAM Role created for Content Sharing function
-        Value: !GetAtt UploadFunctionRole.Arn

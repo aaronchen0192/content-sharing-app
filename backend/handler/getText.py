@@ -40,7 +40,7 @@ def lambda_handler(event, context):
     sid = query_params['sid']
 
     data = dynamodb.get_item(
-        TableName='SharedSpaceText',
+        TableName='SharedSpaceTextTable',
         Key={
             'sid': {
                 'S': sid
