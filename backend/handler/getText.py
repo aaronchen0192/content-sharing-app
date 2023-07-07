@@ -3,7 +3,8 @@ from datetime import datetime
 # import requests
 import boto3
 
-dynamodb = boto3.client('dynamodb')
+dynamodb = boto3.resource('dynamodb')
+textTable = dynamodb.Table('SharedSpaceTextTable')
 
 def lambda_handler(event, context):
     """Sample pure Lambda function
@@ -39,19 +40,12 @@ def lambda_handler(event, context):
 
     sid = query_params['sid']
 
-    data = dynamodb.get_item(
-        TableName='SharedSpaceTextTable',
-        Key={
-            'sid': {
-                'S': sid
-            }
-        }
-    )
+    data = textTable.get_item(Key={'sid': sid})
 
     if not 'Item' in data:
         respond_payload = {'value':''}
     else:
-        respond_payload = {'value':data['Item']['value'], 'expire':data['Item']['expire']}
+        respond_payload = {'value':data['Item']['value'], 'expire':int(data['Item']['expire'])}
 
     return {
         "statusCode": 200,

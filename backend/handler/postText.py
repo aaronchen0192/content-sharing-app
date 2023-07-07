@@ -3,7 +3,8 @@ from datetime import datetime
 # import requests
 import boto3
 
-dynamodb = boto3.client('dynamodb')
+dynamodb = boto3.resource('dynamodb')
+textTable = dynamodb.Table('SharedSpaceTextTable')
 
 def lambda_handler(event, context):
     """Sample pure Lambda function
@@ -38,20 +39,27 @@ def lambda_handler(event, context):
     query_params = event['queryStringParameters']
 
     sid = query_params['sid']
-    text = event['body']
+    text = json.loads(event['body'])
 
-    response = dynamodb.put_item(TableName='SharedSpaceText', Item={'sid':sid, 'value':text})
+    # 15 min
+    expire_time = int(60*15 + datetime.now().timestamp())
+    status_code = 200
 
-
-    print(sid)
-    print(text)
+    #try:
+    textTable.put_item(Item={'sid': sid, 'value': text, 'expire': str(expire_time)})
+    # except ClientError as e:
+    #     if e.response['Error']['Code'] == 'EntityAlreadyExists':
+    #         print("User already exists")
+    #     else:
+    #         print("Unexpected error: %s" % e)
+    #     status_code = 400
 
     return {
-        "statusCode": 200,
+        "statusCode": status_code,
         "headers": {
             "Access-Control-Allow-Headers" : "Content-Type",
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "POST"
         },
-        "body": 1000*60 + datetime.now().timestamp() * 1000,
+        "body": expire_time,
     }

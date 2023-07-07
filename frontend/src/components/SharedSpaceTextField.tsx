@@ -111,7 +111,7 @@ export default function SharedSpaceTextField({
                                         {minutes} min {seconds} sec
                                     </span>
                                 )}
-                                date={data?.expire}
+                                date={data?.expire * 1000}
                             />
                         </span>
                     ) : (
