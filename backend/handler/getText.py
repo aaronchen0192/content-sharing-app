@@ -51,7 +51,7 @@ def lambda_handler(event, context):
     if not 'Item' in data:
         respond_payload = {'value':''}
     else:
-        respond_payload = {'value':data['Item']['value'], 'expire':data['Item']['ttl']}
+        respond_payload = {'value':data['Item']['value'], 'expire':data['Item']['expire']}
 
     return {
         "statusCode": 200,

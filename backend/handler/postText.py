@@ -1,7 +1,9 @@
 import json
 from datetime import datetime
 # import requests
+import boto3
 
+dynamodb = boto3.client('dynamodb')
 
 def lambda_handler(event, context):
     """Sample pure Lambda function
@@ -37,6 +39,9 @@ def lambda_handler(event, context):
 
     sid = query_params['sid']
     text = event['body']
+
+    response = dynamodb.put_item(TableName='SharedSpaceText', Item={'sid':sid, 'value':text})
+
 
     print(sid)
     print(text)
