@@ -1,7 +1,9 @@
 import json
 from datetime import datetime
 # import requests
+import boto3
 
+dynamodb = boto3.client('dynamodb')
 
 def lambda_handler(event, context):
     """Sample pure Lambda function
@@ -37,7 +39,19 @@ def lambda_handler(event, context):
 
     sid = query_params['sid']
 
-    print(sid)
+    data = dynamodb.get_item(
+        TableName='SharedSpaceText',
+        Key={
+            'sid': {
+                'S': sid
+            }
+        }
+    )
+
+    if not 'Item' in data:
+        respond_payload = {'value':''}
+    else:
+        respond_payload = {'value':data['Item']['value'], 'expire':data['Item']['ttl']}
 
     return {
         "statusCode": 200,
@@ -46,8 +60,5 @@ def lambda_handler(event, context):
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "GET"
         },
-        "body": json.dumps({
-            "value": "123",
-            "expire": 1000*60 + datetime.now().timestamp() * 1000
-        }),
+        "body": json.dumps(respond_payload),
     }
