@@ -44,7 +44,7 @@ jobs:
             - name: Invalidate CloudFront Distribution
               uses: chetan/invalidate-cloudfront-action@v2
               env:
-                  DISTRIBUTION: I9DFQE6HVYVNK6QA42J4MFJD7A # Replace with your CloudFront distribution ID
+                  DISTRIBUTION: E3Q579Y8ECPI65 # Replace with your CloudFront distribution ID
                   PATHS: '/*'
                   AWS_REGION: 'us-east-1' # Or your AWS region
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
