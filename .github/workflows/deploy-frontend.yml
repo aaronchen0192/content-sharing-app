@@ -42,9 +42,9 @@ jobs:
                   SOURCE_DIR: 'frontend/dist'
 
             - name: Invalidate CloudFront Distribution
-              uses: chetan/invalidate-cloudfront-action@v1
+              uses: chetan/invalidate-cloudfront-action@v2
               env:
-                  DISTRIBUTION_ID: I9DFQE6HVYVNK6QA42J4MFJD7A # Replace with your CloudFront distribution ID
+                  DISTRIBUTION: I9DFQE6HVYVNK6QA42J4MFJD7A # Replace with your CloudFront distribution ID
                   PATHS: '/*'
                   AWS_REGION: 'us-east-1' # Or your AWS region
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
