@@ -1,45 +1,71 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  content-sharing-app
+    content-sharing-app
 
-  Sample SAM Template for content-sharing-app
+    Sample SAM Template for content-sharing-app
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
-  Function:
-    Timeout: 3
-    MemorySize: 128
+    Function:
+        Timeout: 3
+        MemorySize: 128
 
-    Tracing: Active
-  Api:
-    TracingEnabled: true
+        Tracing: Active
+    Api:
+        TracingEnabled: true
+        Cors:
+            AllowMethods: "'GET,POST,OPTIONS,PUT,DELETE'"
+            AllowHeaders: "'content-type'"
+            AllowOrigin: "'*'"
 Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: hello_world/
-      Handler: app.lambda_handler
-      Runtime: python3.9
-      Architectures:
-      - x86_64
-      Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /hello
-            Method: get
+    GetTextFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: handler/
+            Handler: getText.lambda_handler
+            Runtime: python3.9
+            Architectures:
+                - x86_64
+            Events:
+                GetText:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        Path: /text
+                        Method: get
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: '*'
 
-Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World function
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: Hello World Lambda Function ARN
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+    PostTextFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: handler/
+            Handler: postText.lambda_handler
+            Runtime: python3.9
+            Architectures:
+                - x86_64
+            Events:
+                PostText:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        Path: /text
+                        Method: post
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: '*'
+
+    SharedSpaceDynamoDBTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            TableName: SharedSpaceTextTable
+            AttributeDefinitions:
+                - AttributeName: sid
+                  AttributeType: S
+            KeySchema:
+                - AttributeName: sid
+                  KeyType: HASH
+            BillingMode: PAY_PER_REQUEST # This indicates on-demand capacity
+            TimeToLiveSpecification: # This specifies the TTL attribute
+                AttributeName: expire
+                Enabled: true
