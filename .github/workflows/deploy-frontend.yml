@@ -22,7 +22,7 @@ jobs:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v3
               with:
-                  node-version: [16.x, 18.x]
+                  node-version: 18.x
 
             - name: Install dependencies
               run: npm ci
@@ -39,12 +39,12 @@ jobs:
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   AWS_REGION: 'us-east-1' # Or your AWS region
-                  SOURCE_DIR: 'dist'
+                  SOURCE_DIR: 'frontend/dist'
 
             - name: Invalidate CloudFront Distribution
-              uses: chetan/invalidate-cloudfront-action@v1
+              uses: chetan/invalidate-cloudfront-action@v2
               env:
-                  DISTRIBUTION_ID: I9DFQE6HVYVNK6QA42J4MFJD7A # Replace with your CloudFront distribution ID
+                  DISTRIBUTION: E3Q579Y8ECPI65 # Replace with your CloudFront distribution ID
                   PATHS: '/*'
                   AWS_REGION: 'us-east-1' # Or your AWS region
                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
