@@ -1,0 +1,21 @@
+name: Pull Request API Test
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - api/**
+
+jobs:
+  test:
+    name: pr_test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: docker/build-push-action@v2
+        with:
+          context: ./api
+          file: ./api/Dockerfile
+          push: false

@@ -52,7 +52,7 @@ function App() {
 function Home() {
     return (
         <div>
-            <h2>Home</h2>
+            <h2>Hello World</h2>
         </div>
     );
 }
