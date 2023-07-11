@@ -2,6 +2,7 @@ import { Container, Stack } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import SharedSpaceHeader from './SharedSpaceHeader';
 import SharedSpaceTextField from './SharedSpaceTextField';
+import SharedSpaceFileDropField from './SharedSpaceFileDropField';
 
 export default function SharedSpace() {
     const { sid } = useParams();
@@ -11,6 +12,7 @@ export default function SharedSpace() {
             <Stack direction="column" spacing={4}>
                 <SharedSpaceHeader />
                 <SharedSpaceTextField sid={sid} />
+                <SharedSpaceFileDropField sid={sid} />
             </Stack>
         </Container>
     );
