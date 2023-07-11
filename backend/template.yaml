@@ -64,14 +64,14 @@ Resources:
             Architectures:
                 - x86_64
             Events:
-                FileUpload:
-                    Type: S3
+                PostText:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
                     Properties:
-                        Bucket: !Ref ContentSharedAppUploadsBucket
-                        Events: s3:ObjectCreated:*
+                        Path: /upload
+                        Method: post
             Policies:
-                - DynamoDBCrudPolicy:
-                      TableName: '*'
+                - S3FullAccessPolicy:
+                      BucketName: 'content-shared-app-uploads'
 
     SharedSpaceDynamoDBTable:
         Type: AWS::DynamoDB::Table
@@ -83,7 +83,9 @@ Resources:
             KeySchema:
                 - AttributeName: sid
                   KeyType: HASH
-            BillingMode: PAY_PER_REQUEST # This indicates on-demand capacity
+            ProvisionedThroughput:
+                ReadCapacityUnits: 3
+                WriteCapacityUnits: 3
             TimeToLiveSpecification: # This specifies the TTL attribute
                 AttributeName: expire
                 Enabled: true
@@ -98,7 +100,9 @@ Resources:
             KeySchema:
                 - AttributeName: sid
                   KeyType: HASH
-            BillingMode: PAY_PER_REQUEST # This indicates on-demand capacity
+            ProvisionedThroughput:
+                ReadCapacityUnits: 3
+                WriteCapacityUnits: 3
             TimeToLiveSpecification: # This specifies the TTL attribute
                 AttributeName: expire
                 Enabled: true
@@ -108,30 +112,11 @@ Resources:
         Properties:
             BucketName: content-shared-app-uploads
             PublicAccessBlockConfiguration:
-                BlockPublicAcls: false
-                IgnorePublicAcls: false
-                BlockPublicPolicy: false
-                RestrictPublicBuckets: false
+                BlockPublicAcls: true
+                IgnorePublicAcls: true
+                BlockPublicPolicy: true
+                RestrictPublicBuckets: true
             BucketEncryption:
                 ServerSideEncryptionConfiguration:
                     - ServerSideEncryptionByDefault:
                           SSEAlgorithm: AES256
-
-    BucketPolicy:
-        Type: AWS::S3::BucketPolicy
-        Properties:
-            PolicyDocument:
-                Id: ContentSharedAppUploadsBucketPolicy
-                Version: '2012-10-17'
-                Statement:
-                    - Sid: AllowPublicRead
-                      Effect: Allow
-                      Principal: '*'
-                      Action: 's3:GetObject'
-                      Resource: !Sub 'arn:aws:s3:::content-shared-app-uploads/*'
-                    - Sid: AllowPublicPut
-                      Effect: Allow
-                      Principal: '*'
-                      Action: 's3:PutObject'
-                      Resource: !Sub 'arn:aws:s3:::content-shared-app-uploads/*'
-            Bucket: !Ref ContentSharedAppUploadsBucket
