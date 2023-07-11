@@ -37,12 +37,12 @@ def lambda_handler(event, context):
     #     raise e
 
     #key = event['Records'][0]['s3']['object']['key']
-    tmp = event['Records'][0]['s3']['object']
-    print(tmp)
+    # tmp = event['Records'][0]['s3']['object']
+    # print(tmp)
 
-    # query_params = event['queryStringParameters']
+    query_params = event['queryStringParameters']
 
-    # sid = query_params['sid']
+    sid = query_params['sid']
 
     # data = textTable.get_item(Key={'sid': sid})
 
