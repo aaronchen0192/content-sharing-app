@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import SharedSpaceHeader from './SharedSpaceHeader';
 import SharedSpaceTextField from './SharedSpaceTextField';
 import SharedSpaceFileDropField from './SharedSpaceFileDropField';
+import SharedSpaceUploadedFileList from './SharedSpaceUploadedFileList';
 
 export default function SharedSpace() {
     const { sid } = useParams();
@@ -13,6 +14,7 @@ export default function SharedSpace() {
                 <SharedSpaceHeader />
                 <SharedSpaceTextField sid={sid} />
                 <SharedSpaceFileDropField sid={sid} />
+                <SharedSpaceUploadedFileList sid={sid} />
             </Stack>
         </Container>
     );
