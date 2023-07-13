@@ -2,9 +2,8 @@ import json
 from datetime import datetime
 # import requests
 import boto3
+from botocore.exceptions import ClientError
 
-dynamodb = boto3.resource('dynamodb')
-keyTable = dynamodb.Table('SharedSpaceUploadTable')
 s3 = boto3.client('s3')
 
 def lambda_handler(event, context):
@@ -42,49 +41,20 @@ def lambda_handler(event, context):
     query_params = event['queryStringParameters']
 
     sid = query_params['sid']
-
-    key_name = 'sid'
-    key_value = sid
+    key = query_params['key']
     
-    response = keyTable.get_item(Key={key_name: key_value})
-    
-    item = response.get('Item')
-    if not item:
-        return {
-            'statusCode': 404,
-            'body': 'File key not found in DynamoDB'
-        }
-    
-    file_key = item.get('file_key')
-    if not file_key:
-        return {
-            'statusCode': 404,
-            'body': 'File key not found in DynamoDB'
-        }
-    
-    # Retrieve all files with the same key from Amazon S3
     bucket_name = 'content-shared-app-uploads'
-    
+    s3_key = f'{sid}/{key}'
+
     try:
-        response = s3.list_objects_v2(Bucket=bucket_name, Prefix=key_value)
-        file_objects = response.get('Contents', [])
-    except Exception as e:
+        params = {'Bucket': bucket_name, 'Key': s3_key}
+        url = s3.generate_presigned_url('get_object', Params=params, ExpiresIn=3600)
+    except ClientError as e:
         return {
-            'statusCode': 500,
-            'body': str(e)
+            'statusCode': 404,
+            'body': 'client error'
         }
-    
-    files = []
-    for file_obj in file_objects:
-        file_key = file_obj['Key']
-        response = s3.get_object(Bucket=bucket_name, Key=file_key)
-        file_data = response['Body'].read()
-        
-        files.append({
-            'file_key': file_key,
-            'file_data': file_data
-        })
-    
+
     # Prepare the response
     http_status_code = 200
     headers = {
@@ -96,6 +66,6 @@ def lambda_handler(event, context):
         'statusCode': http_status_code,
         'headers': headers,
         'body': {
-            'files': files
+            'url': url
         }
     }

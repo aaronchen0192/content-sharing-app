@@ -73,6 +73,26 @@ Resources:
                 - S3FullAccessPolicy:
                       BucketName: 'content-shared-app-uploads'
 
+    GetFileKeysFunction:
+        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+        Properties:
+            CodeUri: handler/
+            Handler: getFileKeys.lambda_handler
+            Runtime: python3.9
+            Architectures:
+                - x86_64
+            Events:
+                GetText:
+                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+                    Properties:
+                        Path: /keys
+                        Method: get
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: '*'
+
+    #-------------------DynamoDB Tables-----------------------------
+
     SharedSpaceDynamoDBTable:
         Type: AWS::DynamoDB::Table
         Properties:
@@ -106,6 +126,8 @@ Resources:
             TimeToLiveSpecification: # This specifies the TTL attribute
                 AttributeName: expire
                 Enabled: true
+
+    #-------------------------------S3 Bucket----------------------------
 
     ContentSharedAppUploadsBucket:
         Type: AWS::S3::Bucket

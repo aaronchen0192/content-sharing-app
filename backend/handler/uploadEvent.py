@@ -42,45 +42,57 @@ def lambda_handler(event, context):
 
     query_params = event['queryStringParameters']
     sid = query_params['sid']
+    key = query_params['key']
 
     # Retrieve files from the POST request
-    files = event['files']
+    file_data = event['file']
     
-    # Store each file in S3 and its corresponding key in DynamoDB
-    for file_data in files:
-        # Store file in S3
-        file = file_data['content']
-        file_name = file_data['filename']
+    # Store file in S3 and its corresponding key in DynamoDB
+    file = file_data['content']
+    file_name = file_data['filename']
 
-        # Check file size
-        file_size = len(file)
-        if file_size > BYTES_LIMIT:  # 15MB in bytes
-            print(f"File '{file_name}' exceeds the maximum allowed size")
-            # Handle the error case or skip storing the file
-            continue
-
-        bucket_name = 'content-shared-app-uploads'
-        s3_key = f'{sid}/{file_name}'  # Specify the desired prefix for the S3 object key
-        
-        try:
-            s3.upload_fileobj(file, bucket_name, s3_key)
-        except ClientError as e:
-            print(f"Failed to upload file '{file_name}' to S3: {str(e)}")
-            # Handle the error case
-        
-        # Store file key in DynamoDB
-        key_name = 'sid'
-        
-        item = {
-            key_name: sid,
-            'file_key': s3_key
+    # Check file size
+    file_size = len(file)
+    if file_size > BYTES_LIMIT:  # 15MB in bytes
+        print(f"File '{file_name}' exceeds the maximum allowed size")
+        # Handle the error case or skip storing the file
+        return {
+            'statusCode': 413,
+            'body': 'File too big'
         }
-        
-        try:
-            keyTable.put_item(Item=item)
-        except ClientError as e:
-            print(f"Failed to store file key '{s3_key}' in DynamoDB: {str(e)}")
-            # Handle the error case
+    
+    bucket_name = 'content-shared-app-uploads'
+    s3_key = f'{sid}/{key}'  # Specify the desired prefix for the S3 object key
+    
+    try:
+        s3.upload_fileobj(file, bucket_name, s3_key)
+    except ClientError as e:
+        print(f"Failed to upload file '{file_name}' to S3: {str(e)}")
+        # Handle the error case
+        return {
+            'statusCode': 500,
+            'body': 'S3 bucket storing failed'
+        }
+    
+    # Store file key in DynamoDB
+    minutes = 15
+    expire_time = int(60*minutes + datetime.now().timestamp())
+
+    item = {
+        'sid': sid,
+        'file_key': key,
+        'expire': str(expire_time)
+    }
+    
+    try:
+        keyTable.put_item(Item=item)
+    except ClientError as e:
+        print(f"Failed to store file key '{s3_key}' in DynamoDB: {str(e)}")
+        # Handle the error case
+        return {
+            'statusCode': 500,
+            'body': 'Dynamodb storing failed'
+        }
     
     # Return a success response
     return {
