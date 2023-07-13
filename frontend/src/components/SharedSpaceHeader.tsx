@@ -13,9 +13,6 @@ export default function SharedSpaceHeader() {
                         onClick={() => {
                             try {
                                 copyToClipboard(window.location.href);
-                                toast.success('Shared Space URL Copied', {
-                                    toastId: 'copy',
-                                });
                             } catch (ex) {
                                 console.error(ex);
                                 toast.error('Copy Failed', {

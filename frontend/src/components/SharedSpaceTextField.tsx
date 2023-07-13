@@ -2,20 +2,14 @@ import { Grow, Skeleton, TextField, Typography } from '@mui/material';
 import React from 'react';
 import Countdown from 'react-countdown';
 import { useMutation, useQuery } from 'react-query';
-import { api } from '../api';
+import { TEXT_QUERY_KEY, api } from '../api';
 import { queryClient } from '../queryClient';
 import { toast } from 'react-toastify';
-
-interface TextContent {
-    value?: string;
-    expire?: number;
-}
+import { TextContent } from '../types';
 
 const defaultState: TextContent = {
     value: '',
 };
-
-const TEXT_QUERY_KEY = ['text-content'];
 
 type SharedSpaceTextFieldProps = {
     sid?: string;

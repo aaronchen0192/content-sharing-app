@@ -1,82 +1,137 @@
-import React, { useState } from 'react';
 import Countdown from 'react-countdown';
-import { useMutation, useQuery } from 'react-query';
-import { api } from '../api';
+import { useQuery } from 'react-query';
 import { queryClient } from '../queryClient';
-import { toast } from 'react-toastify';
-import { FileUploader } from 'react-drag-drop-files';
-import CommentIcon from '@mui/icons-material/Comment';
 import {
     Typography,
     Stack,
     List,
-    ListItem,
     ListItemText,
+    Skeleton,
+    Grow,
+    ListItem,
     IconButton,
+    Tooltip,
+    ListItemAvatar,
+    Avatar,
 } from '@mui/material';
+import { FileDownload, Source } from '@mui/icons-material';
+import { QUERY_FILES_KEY } from '../api';
+import { UploadedFile } from '../types';
 
-type SharedSpaceUploadedFileListProps = {
+export type SharedSpaceUploadedFileListProps = {
     sid?: string;
 };
-
-interface UploadedFile {
-    name: string;
-    key?: string;
-    expire?: number;
-}
-
-const BYTES_LIMIT = 1000000;
-
-const fileTypes = ['JPG', 'PNG', 'GIF', 'txt'];
 
 export default function SharedSpaceUploadedFileList({
     sid,
 }: SharedSpaceUploadedFileListProps) {
-    const test: UploadedFile[] = [
-        { name: 'f1', key: 'k1', expire: 100000 },
-        { name: 'f2', key: 'k2', expire: 200000 },
-        { name: 'f3', key: 'k3', expire: Date.now() + 300000 },
-    ];
+    const { data, isFetched, isError } = useQuery<UploadedFile[]>(
+        QUERY_FILES_KEY,
+        () =>
+            // todo: replace with axios get file list
+            new Promise(resolve =>
+                setTimeout(() => {
+                    resolve([
+                        {
+                            name: 'f1',
+                            key: 'k1',
+                            expire: Date.now() / 1000 + 15,
+                        },
+                        {
+                            name: 'f2',
+                            key: 'k2',
+                            expire: Date.now() / 1000 + 20,
+                        },
+                        {
+                            name: 'f3',
+                            key: 'k3',
+                            expire: Date.now() / 1000 + 10,
+                        },
+                    ]);
+                }, 1000 * 2),
+            ),
+        {
+            initialData: [],
+        },
+    );
+
+    if (isError) {
+        return (
+            <Typography color="error">
+                Failed to load upload contents
+            </Typography>
+        );
+    }
+    if (!data || !isFetched) {
+        return (
+            <Stack mt={2} spacing={2}>
+                <Skeleton variant="rounded" height="35px" />
+                <Skeleton variant="rounded" height="35px" />
+                <Skeleton variant="rounded" height="35px" />
+                <Skeleton variant="rounded" height="35px" />
+            </Stack>
+        );
+    }
+
+    const onDownloadFile = () => {
+        window.open(`http://www.example.com?sid=${sid}`, '_blank');
+    };
 
     return (
         <List>
-            {test.map(file => (
-                <ListItem
-                    disableGutters
-                    secondaryAction={
-                        <IconButton aria-label="comment">
-                            <CommentIcon />
-                        </IconButton>
-                    }>
-                    <ListItemText
-                        primary={`Line item ${file.name}`}
-                        secondary={
-                            !file?.expire ? (
-                                'Uploading...'
-                            ) : file?.expire ? (
-                                <span>
-                                    Expired in:{' '}
-                                    <Countdown
-                                        onComplete={() => {
-                                            //queryClient.setQueryData(
-                                            //TEXT_QUERY_KEY,
-                                            //defaultState,
-                                            //);
-                                        }}
-                                        renderer={({ minutes, seconds }) => (
-                                            <span>
-                                                {minutes} min {seconds} sec
-                                            </span>
-                                        )}
-                                        date={file?.expire * 1000}
-                                    />
-                                </span>
-                            ) : (
-                                ''
-                            )
-                        }
-                    />
-                </ListItem>
+            {data.map(file => (
+                <Grow in key={file.key}>
+                    <ListItem
+                        divider
+                        secondaryAction={
+                            <Tooltip title="Download Content">
+                                <IconButton onClick={onDownloadFile}>
+                                    <FileDownload color="action" />
+                                </IconButton>
+                            </Tooltip>
+                        }>
+                        <ListItemAvatar>
+                            <Avatar>
+                                <Source />
+                            </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                            primary={`Line item ${file.name}`}
+                            secondary={
+                                !file?.expire ? (
+                                    'Uploading...'
+                                ) : (
+                                    <span>
+                                        Expired in:{' '}
+                                        <Countdown
+                                            onComplete={() => {
+                                                const now = Date.now() / 1000;
+                                                queryClient.setQueryData(
+                                                    QUERY_FILES_KEY,
+                                                    (fl?: UploadedFile[]) =>
+                                                        fl?.filter(
+                                                            f =>
+                                                                now <=
+                                                                (f.expire ?? 0),
+                                                        ) ?? [],
+                                                );
+                                            }}
+                                            renderer={({
+                                                minutes,
+                                                seconds,
+                                            }) => (
+                                                <span>
+                                                    {minutes} min {seconds} sec
+                                                </span>
+                                            )}
+                                            date={file?.expire * 1000}
+                                        />
+                                    </span>
+                                )
+                            }
+                        />
+                    </ListItem>
+                </Grow>
             ))}
         </List>
     );

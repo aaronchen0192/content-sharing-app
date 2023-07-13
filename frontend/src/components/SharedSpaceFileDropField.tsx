@@ -1,45 +1,66 @@
-import React, { useState } from 'react';
-import Countdown from 'react-countdown';
-import { useMutation, useQuery } from 'react-query';
-import { api } from '../api';
-import { queryClient } from '../queryClient';
-import { toast } from 'react-toastify';
+import { Typography } from '@mui/material';
 import { FileUploader } from 'react-drag-drop-files';
-import CommentIcon from '@mui/icons-material/Comment';
-import {
-    Typography,
-    Stack,
-    List,
-    ListItem,
-    ListItemText,
-    IconButton,
-} from '@mui/material';
+import { queryClient } from '../queryClient';
+import { UploadedFile } from '../types';
+import { QUERY_FILES_KEY } from '../api';
+import { uid } from 'uid';
+import { toast } from 'react-toastify';
 
 type SharedSpaceFileDropFieldProps = {
     sid?: string;
 };
 
-const BYTES_LIMIT = 1000000;
-
-const fileTypes = ['JPG', 'PNG', 'GIF', 'txt'];
-
 export default function SharedSpaceFileDropField({
     sid,
 }: SharedSpaceFileDropFieldProps) {
-    const [files, setFile] = useState<File[] | null>(null);
-
     return (
         <FileUploader
+            maxSize={15}
+            classes="file-uploader"
             handleChange={(files: FileList) => {
-                const fileArr: File[] = [];
+                if (files.length > 5) {
+                    toast.error('Cannot upload more than 5 files at once');
+                    return;
+                }
 
                 for (const file of files) {
-                    fileArr.push(file);
+                    const key = uid(16);
+
+                    queryClient.setQueryData(
+                        QUERY_FILES_KEY,
+                        (fl?: UploadedFile[]) => [
+                            ...(fl ?? []),
+                            {
+                                name: file.name,
+                                key,
+                            },
+                        ],
+                    );
+
+                    // replace promise with axios call
+                    new Promise(resolve => {
+                        setTimeout(() => {
+                            const uploadedFile = {
+                                name: file.name,
+                                key,
+                                expire: Date.now() / 1000 + 15,
+                            };
+                            // api.post(...).then(({data: uploadedFile})=>{  })
+                            queryClient.setQueryData(
+                                QUERY_FILES_KEY,
+                                (fl?: UploadedFile[]) =>
+                                    (fl ?? []).map(f =>
+                                        f.key === key ? uploadedFile : f,
+                                    ),
+                            );
+
+                            resolve(0);
+                        }, 1000 * 3);
+                    });
                 }
-                setFile(fileArr);
+                // setFile(fileArr);
             }}
             multiple
-            types={fileTypes}
         />
     );
 }

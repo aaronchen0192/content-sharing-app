@@ -13,8 +13,10 @@ export default function SharedSpace() {
             <Stack direction="column" spacing={4}>
                 <SharedSpaceHeader />
                 <SharedSpaceTextField sid={sid} />
-                <SharedSpaceFileDropField sid={sid} />
-                <SharedSpaceUploadedFileList sid={sid} />
+                <div>
+                    <SharedSpaceFileDropField sid={sid} />
+                    <SharedSpaceUploadedFileList sid={sid} />
+                </div>
             </Stack>
         </Container>
     );
