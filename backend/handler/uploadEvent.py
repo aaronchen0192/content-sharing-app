@@ -97,5 +97,5 @@ def lambda_handler(event, context):
     # Return a success response
     return {
         'statusCode': 200,
-        'body': 'Files stored successfully'
+        "body": expire_time,
     }
