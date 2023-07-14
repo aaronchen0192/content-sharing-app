@@ -6,18 +6,18 @@ import SharedSpaceFileDropField from './SharedSpaceFileDropField';
 import SharedSpaceUploadedFileList from './SharedSpaceUploadedFileList';
 
 export default function SharedSpace() {
-    const { sid } = useParams();
+  const { sid } = useParams();
 
-    return (
-        <Container maxWidth="sm">
-            <Stack direction="column" spacing={4}>
-                <SharedSpaceHeader />
-                <SharedSpaceTextField sid={sid} />
-                <div>
-                    <SharedSpaceFileDropField sid={sid} />
-                    <SharedSpaceUploadedFileList sid={sid} />
-                </div>
-            </Stack>
-        </Container>
-    );
+  return (
+    <Container maxWidth="sm">
+      <Stack direction="column" spacing={4}>
+        <SharedSpaceHeader />
+        <SharedSpaceTextField sid={sid} />
+        <div>
+          <SharedSpaceFileDropField sid={sid} />
+          <SharedSpaceUploadedFileList sid={sid} />
+        </div>
+      </Stack>
+    </Container>
+  );
 }
