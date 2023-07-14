@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 import { FileUploader } from 'react-drag-drop-files';
 import { queryClient } from '../queryClient';
 import { UploadedFile } from '../types';
-import { QUERY_FILES_KEY } from '../api';
+import { QUERY_FILES_KEY, api } from '../api';
 import { uid } from 'uid';
 import { toast } from 'react-toastify';
 
@@ -26,6 +26,8 @@ export default function SharedSpaceFileDropField({
                 for (const file of files) {
                     const key = uid(16);
 
+                    // make it display uploading first
+                    // thats why no expire
                     queryClient.setQueryData(
                         QUERY_FILES_KEY,
                         (fl?: UploadedFile[]) => [
@@ -38,6 +40,11 @@ export default function SharedSpaceFileDropField({
                     );
 
                     // replace promise with axios call
+
+                    api.post('/upload', { params: { sid, key, file } }).then(
+                        d => d.data as number,
+                    );
+
                     new Promise(resolve => {
                         setTimeout(() => {
                             const uploadedFile = {
