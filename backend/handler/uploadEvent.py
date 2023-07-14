@@ -97,5 +97,10 @@ def lambda_handler(event, context):
     # Return a success response
     return {
         'statusCode': 200,
+        "headers": {
+            "Access-Control-Allow-Headers" : "Content-Type",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET"
+        },
         "body": expire_time,
     }

@@ -35,8 +35,6 @@ export default function SharedSpaceFileDropField({
             },
           ]);
 
-          // replace promise with axios call
-
           api.post('/upload', { params: { sid, key, file } }).then(d => {
             const expire = d.data as number;
             queryClient.setQueryData(QUERY_FILES_KEY, (fl?: UploadedFile[]) =>

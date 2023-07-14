@@ -45,11 +45,11 @@ def lambda_handler(event, context):
     response = keyTable.batch_get_item(Key={'sid': sid})
     
     items = response['Responses'].get('SharedSpaceUploadTable', [])
-    if not items:
-        return {
-            'statusCode': 404,
-            'body': 'sid not found in DynamoDB'
-        }
+    # if not items:
+    #     return {
+    #         'statusCode': 404,
+    #         'body': 'sid not found in DynamoDB'
+    #     }
 
     keys = []
     for item in items:
@@ -61,7 +61,9 @@ def lambda_handler(event, context):
     # Prepare the response
     http_status_code = 200
     headers = {
-        'Content-Type': 'application/json'  # Set the appropriate content type
+        "Access-Control-Allow-Headers" : "Content-Type",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST"
     }
     
     # Return the files as the response

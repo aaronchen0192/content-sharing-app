@@ -27,7 +27,7 @@ export default function SharedSpaceUploadedFileList({
 }: SharedSpaceUploadedFileListProps) {
   const { data, isFetched, isError } = useQuery<UploadedFile[]>(
     QUERY_FILES_KEY,
-    () => api.get('/keys', { params: { sid } }).then(d => d.data),
+    () => api.get('/upload', { params: { sid } }).then(d => d.data),
     {
       initialData: [
         {
@@ -37,32 +37,6 @@ export default function SharedSpaceUploadedFileList({
         },
       ],
     },
-    // () =>
-    //     // todo: replace with axios get file list
-    //     new Promise(resolve =>
-    //         setTimeout(() => {
-    //             resolve([
-    //                 {
-    //                     name: 'f1',
-    //                     key: 'k1',
-    //                     expire: Date.now() / 1000 + 15,
-    //                 },
-    //                 {
-    //                     name: 'f2',
-    //                     key: 'k2',
-    //                     expire: Date.now() / 1000 + 20,
-    //                 },
-    //                 {
-    //                     name: 'f3',
-    //                     key: 'k3',
-    //                     expire: Date.now() / 1000 + 10,
-    //                 },
-    //             ]);
-    //         }, 1000 * 2),
-    //     ),
-    // {
-    //     initialData: [],
-    // },
   );
 
   if (isError) {
@@ -81,8 +55,11 @@ export default function SharedSpaceUploadedFileList({
     );
   }
 
-  const onDownloadFile = () => {
-    window.open(`http://www.example.com?sid=${sid}`, '_blank');
+  const onDownloadFile = (key: string) => {
+    api.get('/fileContent', { params: { sid, key } }).then(d => {
+      const downloadUrl = d.data;
+      window.open(downloadUrl, 'blank');
+    });
   };
 
   return (
@@ -93,7 +70,7 @@ export default function SharedSpaceUploadedFileList({
             divider
             secondaryAction={
               <Tooltip title="Download Content">
-                <IconButton onClick={onDownloadFile}>
+                <IconButton onClick={() => onDownloadFile(file.key)}>
                   <FileDownload color="action" />
                 </IconButton>
               </Tooltip>
