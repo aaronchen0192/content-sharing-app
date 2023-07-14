@@ -15,7 +15,7 @@ import {
     Avatar,
 } from '@mui/material';
 import { FileDownload, Source } from '@mui/icons-material';
-import { QUERY_FILES_KEY } from '../api';
+import { QUERY_FILES_KEY, api } from '../api';
 import { UploadedFile } from '../types';
 
 export type SharedSpaceUploadedFileListProps = {
@@ -27,32 +27,42 @@ export default function SharedSpaceUploadedFileList({
 }: SharedSpaceUploadedFileListProps) {
     const { data, isFetched, isError } = useQuery<UploadedFile[]>(
         QUERY_FILES_KEY,
-        () =>
-            // todo: replace with axios get file list
-            new Promise(resolve =>
-                setTimeout(() => {
-                    resolve([
-                        {
-                            name: 'f1',
-                            key: 'k1',
-                            expire: Date.now() / 1000 + 15,
-                        },
-                        {
-                            name: 'f2',
-                            key: 'k2',
-                            expire: Date.now() / 1000 + 20,
-                        },
-                        {
-                            name: 'f3',
-                            key: 'k3',
-                            expire: Date.now() / 1000 + 10,
-                        },
-                    ]);
-                }, 1000 * 2),
-            ),
+        () => api.get('/keys', { params: { sid } }).then(d => d.data),
         {
-            initialData: [],
+            initialData: [
+                {
+                    name: 'f1',
+                    key: 'k1',
+                    expire: Date.now() / 1000 + 15,
+                },
+            ],
         },
+        // () =>
+        //     // todo: replace with axios get file list
+        //     new Promise(resolve =>
+        //         setTimeout(() => {
+        //             resolve([
+        //                 {
+        //                     name: 'f1',
+        //                     key: 'k1',
+        //                     expire: Date.now() / 1000 + 15,
+        //                 },
+        //                 {
+        //                     name: 'f2',
+        //                     key: 'k2',
+        //                     expire: Date.now() / 1000 + 20,
+        //                 },
+        //                 {
+        //                     name: 'f3',
+        //                     key: 'k3',
+        //                     expire: Date.now() / 1000 + 10,
+        //                 },
+        //             ]);
+        //         }, 1000 * 2),
+        //     ),
+        // {
+        //     initialData: [],
+        // },
     );
 
     if (isError) {
