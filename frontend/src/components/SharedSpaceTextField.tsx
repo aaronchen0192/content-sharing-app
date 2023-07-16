@@ -2,133 +2,122 @@ import { Grow, Skeleton, TextField, Typography } from '@mui/material';
 import React from 'react';
 import Countdown from 'react-countdown';
 import { useMutation, useQuery } from 'react-query';
-import { api } from '../api';
+import { TEXT_QUERY_KEY, api } from '../api';
 import { queryClient } from '../queryClient';
 import { toast } from 'react-toastify';
-
-interface TextContent {
-    value?: string;
-    expire?: number;
-}
+import { TextContent } from '../types';
 
 const defaultState: TextContent = {
-    value: '',
+  value: '',
 };
 
-const TEXT_QUERY_KEY = ['text-content'];
-
 type SharedSpaceTextFieldProps = {
-    sid?: string;
+  sid?: string;
 };
 
 export default function SharedSpaceTextField({
-    sid,
+  sid,
 }: SharedSpaceTextFieldProps) {
-    const { data, isLoading, isError } = useQuery<TextContent>(
-        TEXT_QUERY_KEY,
-        () => api.get('/text', { params: { sid } }).then(d => d.data),
-        {
-            enabled: Boolean(sid),
-        },
-    );
+  const { data, isLoading, isError } = useQuery<TextContent>(
+    TEXT_QUERY_KEY,
+    () => api.get('/text', { params: { sid } }).then(d => d.data),
+    {
+      enabled: Boolean(sid),
+    },
+  );
 
-    const { mutateAsync, isLoading: isMutationLoading } = useMutation(
-        (data: string) =>
-            api
-                .post('/text', JSON.stringify(data), { params: { sid } })
-                .then(d => d.data as number),
-    );
+  const { mutateAsync, isLoading: isMutationLoading } = useMutation(
+    (data: string) =>
+      api
+        .post('/text', JSON.stringify(data), { params: { sid } })
+        .then(d => d.data as number),
+  );
 
-    const [debounceValue, setDebounceValue] = React.useState<string | null>(
-        null,
-    );
+  const [debounceValue, setDebounceValue] = React.useState<string | null>(null);
 
-    React.useEffect(() => {
-        if (debounceValue !== null) {
-            const timeout = setTimeout(() => {
-                queryClient.setQueryData(
-                    TEXT_QUERY_KEY,
-                    (s: TextContent | undefined) => ({
-                        ...s,
-                        value: debounceValue,
-                    }),
-                );
-
-                mutateAsync(debounceValue, {
-                    onSuccess: expire => {
-                        queryClient.setQueryData(
-                            TEXT_QUERY_KEY,
-                            (s: TextContent | undefined) => ({
-                                ...s,
-                                expire,
-                            }),
-                        );
-                    },
-                    onError: () => {
-                        toast.error('Failed to save!');
-                    },
-                });
-            }, 250);
-
-            return () => {
-                clearTimeout(timeout);
-            };
-        }
-    }, [debounceValue, mutateAsync]);
-
-    if (isLoading) {
-        return <Skeleton variant="rounded" width="100%" height="80px" />;
-    }
-
-    if (isError) {
-        return (
-            <Typography color="error">
-                Failed to fetch content, please try again later!
-            </Typography>
+  React.useEffect(() => {
+    if (debounceValue !== null) {
+      const timeout = setTimeout(() => {
+        queryClient.setQueryData(
+          TEXT_QUERY_KEY,
+          (s: TextContent | undefined) => ({
+            ...s,
+            value: debounceValue,
+          }),
         );
-    }
 
+        mutateAsync(debounceValue, {
+          onSuccess: expire => {
+            queryClient.setQueryData(
+              TEXT_QUERY_KEY,
+              (s: TextContent | undefined) => ({
+                ...s,
+                expire,
+              }),
+            );
+          },
+          onError: () => {
+            toast.error('Failed to save!');
+          },
+        });
+      }, 250);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [debounceValue, mutateAsync]);
+
+  if (isLoading) {
+    return <Skeleton variant="rounded" width="100%" height="80px" />;
+  }
+
+  if (isError) {
     return (
-        <Grow in>
-            <TextField
-                label="Shared Text"
-                helperText={
-                    isMutationLoading ? (
-                        'Saving...'
-                    ) : data?.expire ? (
-                        <span>
-                            Expired in:{' '}
-                            <Countdown
-                                onComplete={() => {
-                                    queryClient.setQueryData(
-                                        TEXT_QUERY_KEY,
-                                        defaultState,
-                                    );
-                                    setDebounceValue(null);
-                                }}
-                                renderer={({ minutes, seconds }) => (
-                                    <span>
-                                        {minutes} min {seconds} sec
-                                    </span>
-                                )}
-                                date={data?.expire * 1000}
-                            />
-                        </span>
-                    ) : (
-                        ''
-                    )
-                }
-                multiline
-                minRows={2}
-                maxRows={15}
-                fullWidth
-                value={debounceValue ?? data?.value ?? ''}
-                onChange={e => {
-                    if (e.target.value.length < 10000) {
-                        setDebounceValue(e.target.value);
-                    }
-                }}
-            />
-        </Grow>
+      <Typography color="error">
+        Failed to fetch content, please try again later!
+      </Typography>
     );
+  }
+
+  return (
+    <Grow in>
+      <TextField
+        label="Shared Text"
+        helperText={
+          isMutationLoading ? (
+            'Saving...'
+          ) : data?.expire ? (
+            <span>
+              Expired in:{' '}
+              <Countdown
+                onComplete={() => {
+                  queryClient.setQueryData(TEXT_QUERY_KEY, defaultState);
+                  setDebounceValue(null);
+                }}
+                renderer={({ minutes, seconds }) => (
+                  <span>
+                    {minutes} min {seconds} sec
+                  </span>
+                )}
+                date={data?.expire * 1000}
+              />
+            </span>
+          ) : (
+            ''
+          )
+        }
+        multiline
+        minRows={2}
+        maxRows={15}
+        fullWidth
+        value={debounceValue ?? data?.value ?? ''}
+        onChange={e => {
+          if (e.target.value.length < 10000) {
+            setDebounceValue(e.target.value);
+          }
+        }}
+      />
+    </Grow>
+  );
 }

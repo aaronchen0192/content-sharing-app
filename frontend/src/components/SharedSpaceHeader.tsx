@@ -4,32 +4,29 @@ import copyToClipboard from 'copy-to-clipboard';
 import { toast } from 'react-toastify';
 
 export default function SharedSpaceHeader() {
-    return (
-        <TextField
-            label="Share Space URL"
-            InputProps={{
-                endAdornment: (
-                    <IconButton
-                        onClick={() => {
-                            try {
-                                copyToClipboard(window.location.href);
-                                toast.success('Shared Space URL Copied', {
-                                    toastId: 'copy',
-                                });
-                            } catch (ex) {
-                                console.error(ex);
-                                toast.error('Copy Failed', {
-                                    toastId: 'copy',
-                                });
-                            }
-                        }}>
-                        <ContentCopy />
-                    </IconButton>
-                ),
-            }}
-            variant="standard"
-            value={window.location.href}
-            fullWidth
-        />
-    );
+  return (
+    <TextField
+      label="Share Space URL"
+      InputProps={{
+        endAdornment: (
+          <IconButton
+            onClick={() => {
+              try {
+                copyToClipboard(window.location.href);
+              } catch (ex) {
+                console.error(ex);
+                toast.error('Copy Failed', {
+                  toastId: 'copy',
+                });
+              }
+            }}>
+            <ContentCopy />
+          </IconButton>
+        ),
+      }}
+      variant="standard"
+      value={window.location.href}
+      fullWidth
+    />
+  );
 }

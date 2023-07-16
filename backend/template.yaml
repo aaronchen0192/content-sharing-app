@@ -1,71 +1,162 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-    content-sharing-app
+  content-sharing-app
 
-    Sample SAM Template for content-sharing-app
+  Sample SAM Template for content-sharing-app
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
-    Function:
-        Timeout: 3
-        MemorySize: 128
+  Function:
+    Timeout: 3
+    MemorySize: 128
 
-        Tracing: Active
-    Api:
-        TracingEnabled: true
-        Cors:
-            AllowMethods: "'GET,POST,OPTIONS,PUT,DELETE'"
-            AllowHeaders: "'content-type'"
-            AllowOrigin: "'*'"
+    Tracing: Active
+  Api:
+    TracingEnabled: true
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS,PUT,DELETE'"
+      AllowHeaders: "'content-type'"
+      AllowOrigin: "'*'"
 Resources:
-    GetTextFunction:
-        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-        Properties:
-            CodeUri: handler/
-            Handler: getText.lambda_handler
-            Runtime: python3.9
-            Architectures:
-                - x86_64
-            Events:
-                GetText:
-                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-                    Properties:
-                        Path: /text
-                        Method: get
-            Policies:
-                - DynamoDBCrudPolicy:
-                      TableName: '*'
+  GetTextFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: handler/
+      Handler: getText.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        GetText:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /text
+            Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: '*'
 
-    PostTextFunction:
-        Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-        Properties:
-            CodeUri: handler/
-            Handler: postText.lambda_handler
-            Runtime: python3.9
-            Architectures:
-                - x86_64
-            Events:
-                PostText:
-                    Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-                    Properties:
-                        Path: /text
-                        Method: post
-            Policies:
-                - DynamoDBCrudPolicy:
-                      TableName: '*'
+  PostTextFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: handler/
+      Handler: postText.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        PostText:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /text
+            Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: '*'
 
-    SharedSpaceDynamoDBTable:
-        Type: AWS::DynamoDB::Table
-        Properties:
-            TableName: SharedSpaceTextTable
-            AttributeDefinitions:
-                - AttributeName: sid
-                  AttributeType: S
-            KeySchema:
-                - AttributeName: sid
-                  KeyType: HASH
-            BillingMode: PAY_PER_REQUEST # This indicates on-demand capacity
-            TimeToLiveSpecification: # This specifies the TTL attribute
-                AttributeName: expire
-                Enabled: true
+  UploadEventFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: handler/
+      Handler: uploadEvent.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        PostText:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /upload
+            Method: post
+      Policies:
+        - S3FullAccessPolicy:
+            BucketName: 'content-shared-app-uploads'
+
+  GetFileKeysFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: handler/
+      Handler: getFileKeys.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        GetText:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /upload
+            Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: '*'
+
+  DownloadFileFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: handler/
+      Handler: downloadFile.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        GetText:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /fileContent
+            Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: '*'
+
+  #-------------------DynamoDB Tables-----------------------------
+
+  SharedSpaceDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: SharedSpaceTextTable
+      AttributeDefinitions:
+        - AttributeName: sid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: sid
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 3
+        WriteCapacityUnits: 3
+      TimeToLiveSpecification: # This specifies the TTL attribute
+        AttributeName: expire
+        Enabled: true
+
+  SharedSpaceUploadDynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: SharedSpaceUploadTable
+      AttributeDefinitions:
+        - AttributeName: sid
+          AttributeType: S
+      KeySchema:
+        - AttributeName: sid
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 3
+        WriteCapacityUnits: 3
+      TimeToLiveSpecification: # This specifies the TTL attribute
+        AttributeName: expire
+        Enabled: true
+
+  #-------------------------------S3 Bucket----------------------------
+
+  ContentSharedAppUploadsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: content-shared-app-uploads
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
