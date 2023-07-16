@@ -105,11 +105,9 @@ Resources:
         GetText:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /file
+            Path: /file/content
             Method: get
       Policies:
-        - DynamoDBCrudPolicy:
-            TableName: '*'
         - S3FullAccessPolicy:
             BucketName: 'content-shared-app-uploads'
 

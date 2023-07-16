@@ -56,7 +56,7 @@ export default function SharedSpaceUploadedFileList({
   }
 
   const onDownloadFile = (key: string) => {
-    api.get('/file', { params: { sid, key } }).then(d => {
+    api.get('/file/content', { params: { sid, key } }).then(d => {
       const downloadUrl = d.data;
       window.open(downloadUrl, 'blank');
     });
