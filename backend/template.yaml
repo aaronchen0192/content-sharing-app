@@ -72,6 +72,8 @@ Resources:
       Policies:
         - S3FullAccessPolicy:
             BucketName: 'content-shared-app-uploads'
+        - DynamoDBCrudPolicy:
+            TableName: '*'
 
   GetFileKeysFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
@@ -108,6 +110,8 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: '*'
+        - S3FullAccessPolicy:
+            BucketName: 'content-shared-app-uploads'
 
   #-------------------DynamoDB Tables-----------------------------
 
