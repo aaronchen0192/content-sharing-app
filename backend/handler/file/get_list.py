@@ -1,10 +1,9 @@
-from datetime import datetime
-# import requests
+import json
 import boto3
 from boto3.dynamodb.conditions import Key
 
 dynamodb = boto3.resource('dynamodb')
-fileTable = dynamodb.Table('SharedSpaceUploadTable')
+fileTable = dynamodb.Table('SharedSpaceFileTable')
 
 def lambda_handler(event, context):
 
@@ -14,7 +13,9 @@ def lambda_handler(event, context):
 
     sid = query_params['sid']
     
-    response = fileTable.query(KeyConditionExpression = Key('sid').eq(sid))
+    response = fileTable.query(
+        KeyConditionExpression = Key('sid').eq(sid)
+    )
     
     items = response['Items']
     # if not items:
@@ -31,19 +32,13 @@ def lambda_handler(event, context):
             'expire': int(item['expire'])
         })
     
-    # Prepare the response
-    http_status_code = 200
-    headers = {
-        "Access-Control-Allow-Headers" : "Content-Type",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST"
-    }
-    
     # Return the files as the response
     return {
-        'statusCode': http_status_code,
-        'headers': headers,
-        'body': {
-            'keys': keys
-        }
+        'statusCode': 200,
+        'headers': {
+            "Access-Control-Allow-Headers" : "Content-Type",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "*"
+        },
+        'body': json.dumps(keys) 
     }

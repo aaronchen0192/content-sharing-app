@@ -1,10 +1,10 @@
 import json
-from datetime import datetime
 # import requests
 import boto3
-from botocore.exceptions import ClientError
+import time
 
-s3 = boto3.client('s3')
+dynamodb = boto3.resource('dynamodb')
+textTable = dynamodb.Table('SharedSpaceTextTable')
 
 def lambda_handler(event, context):
     """Sample pure Lambda function
@@ -36,31 +36,30 @@ def lambda_handler(event, context):
 
     #     raise e
 
-    # Retrieve the file key from DynamoDB
-    
     query_params = event['queryStringParameters']
 
     sid = query_params['sid']
-    key = query_params['key']
-    
-    bucket_name = 'content-shared-app-uploads'
-    s3_key = f'{sid}/{key}'
+    text = json.loads(event['body'])
 
-    try:
-        params = {'Bucket': bucket_name, 'Key': s3_key}
-        url = s3.generate_presigned_url('get_object', Params=params, ExpiresIn=3600)
-    except ClientError as e:
-        return {
-            'statusCode': 404,
-            'body': 'Resource not found'
-        }
-    
+    # 15 min
+    expire_time = 60*15 + int(time.time()) 
+    status_code = 200
+
+    #try:
+    textTable.put_item(Item={'sid': sid, 'value': text, 'expire': expire_time})
+    # except ClientError as e:
+    #     if e.response['Error']['Code'] == 'EntityAlreadyExists':
+    #         print("User already exists")
+    #     else:
+    #         print("Unexpected error: %s" % e)
+    #     status_code = 400
+
     return {
-        'statusCode': 302,
+        "statusCode": status_code,
         "headers": {
             "Access-Control-Allow-Headers" : "Content-Type",
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET",
-            "Location": url,
-        }
+            "Access-Control-Allow-Methods": "*"
+        },
+        "body": expire_time,
     }

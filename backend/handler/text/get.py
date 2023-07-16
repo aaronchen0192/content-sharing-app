@@ -39,27 +39,20 @@ def lambda_handler(event, context):
     query_params = event['queryStringParameters']
 
     sid = query_params['sid']
-    text = json.loads(event['body'])
 
-    # 15 min
-    expire_time = int(60*15 + datetime.now().timestamp())
-    status_code = 200
+    data = textTable.get_item(Key={'sid': sid})
 
-    #try:
-    textTable.put_item(Item={'sid': sid, 'value': text, 'expire': str(expire_time)})
-    # except ClientError as e:
-    #     if e.response['Error']['Code'] == 'EntityAlreadyExists':
-    #         print("User already exists")
-    #     else:
-    #         print("Unexpected error: %s" % e)
-    #     status_code = 400
+    if not 'Item' in data:
+        respond_payload = {'value':''}
+    else:
+        respond_payload = {'value':data['Item']['value'], 'expire':int(data['Item']['expire'])}
 
     return {
-        "statusCode": status_code,
+        "statusCode": 200,
         "headers": {
             "Access-Control-Allow-Headers" : "Content-Type",
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "POST"
+            "Access-Control-Allow-Methods": "*"
         },
-        "body": expire_time,
+        "body": json.dumps(respond_payload),
     }

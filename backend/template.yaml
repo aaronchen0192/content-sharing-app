@@ -23,7 +23,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: handler/text
-      Handler: getText.lambda_handler
+      Handler: get.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
@@ -41,7 +41,7 @@ Resources:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: handler/text
-      Handler: postText.lambda_handler
+      Handler: post.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
@@ -55,11 +55,11 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: '*'
 
-  UploadEventFunction:
+  PostFileKeyFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: handler/file
-      Handler: postFile.lambda_handler
+      Handler: post_key.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
@@ -67,19 +67,17 @@ Resources:
         PostText:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /file
+            Path: /file/key
             Method: post
       Policies:
-        - S3FullAccessPolicy:
-            BucketName: 'content-shared-app-uploads'
         - DynamoDBCrudPolicy:
             TableName: '*'
 
-  GetFileKeysFunction:
+  GetFileListFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: handler/file
-      Handler: getFileList.lambda_handler
+      Handler: get_list.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
@@ -93,11 +91,11 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: '*'
 
-  DownloadFileFunction:
+  GetFileRetrieveSignedUrlFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: handler/file
-      Handler: getFile.lambda_handler
+      Handler: get_retrieve-signed-url.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
@@ -105,7 +103,25 @@ Resources:
         GetText:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /file/content
+            Path: /file/retrieve/signed-url
+            Method: get
+      Policies:
+        - S3FullAccessPolicy:
+            BucketName: 'content-shared-app-uploads'
+
+  GetFileUploadSignedUrlFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: handler/file
+      Handler: get_upload-signed-url.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Events:
+        GetText:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /file/upload/signed-url
             Method: get
       Policies:
         - S3FullAccessPolicy:
@@ -130,16 +146,20 @@ Resources:
         AttributeName: expire
         Enabled: true
 
-  SharedSpaceUploadDynamoDBTable:
+  SharedSpaceFileDynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: SharedSpaceUploadTable
+      TableName: SharedSpaceFileTable
       AttributeDefinitions:
         - AttributeName: sid
+          AttributeType: S
+        - AttributeName: key
           AttributeType: S
       KeySchema:
         - AttributeName: sid
           KeyType: HASH
+        - AttributeName: key
+          KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 3
         WriteCapacityUnits: 3
@@ -162,3 +182,16 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+              - PUT
+              - POST
+              - DELETE
+              - HEAD
+            AllowedOrigins:
+              - '*'
+            MaxAge: 3000

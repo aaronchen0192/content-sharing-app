@@ -16,17 +16,15 @@ export default function SharedSpaceFileDropField({
     <FileUploader
       maxSize={15}
       classes="file-uploader"
-      handleChange={(files: FileList) => {
+      handleChange={async (files: FileList) => {
         if (files.length > 5) {
           toast.error('Cannot upload more than 5 files at once');
           return;
         }
-
         for (const file of files) {
           const key = uid(16);
 
-          // make it display uploading first
-          // thats why no expire
+          // create initial file content as loading status
           queryClient.setQueryData(QUERY_FILES_KEY, (fl?: UploadedFile[]) => [
             ...(fl ?? []),
             {
@@ -35,8 +33,31 @@ export default function SharedSpaceFileDropField({
             },
           ]);
 
-          api.post('/file', { params: { sid, key, file } }).then(d => {
-            const expire = d.data as number;
+          try {
+            // get s3 presigned url for post
+            const { data: presignedUrl } = await api.get<string>(
+              `file/upload/signed-url`,
+              {
+                params: { sid, key, fileType: file.type },
+              },
+            );
+            // post to s3
+            await api.put(presignedUrl, file, {
+              headers: {
+                'Content-Type': file.type,
+              },
+            });
+
+            // post key for tracking
+            const { data: expire } = await api.post(
+              'file/key',
+              JSON.stringify(file.name),
+              {
+                params: { sid, key },
+              },
+            );
+
+            // upload file success, update expire date
             queryClient.setQueryData(QUERY_FILES_KEY, (fl?: UploadedFile[]) =>
               (fl ?? []).map(f =>
                 f.key === key
@@ -47,7 +68,19 @@ export default function SharedSpaceFileDropField({
                   : f,
               ),
             );
-          });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } catch (ex: any) {
+            toast.error(
+              `Failed to upload ${file.name} - ${
+                ex.message ?? 'UNKNOWN ERROR'
+              }`,
+            );
+
+            // upload file success, update expire date
+            queryClient.setQueryData(QUERY_FILES_KEY, (fl?: UploadedFile[]) =>
+              (fl ?? []).filter(f => f.key !== key),
+            );
+          }
         }
       }}
       multiple

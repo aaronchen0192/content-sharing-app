@@ -15,7 +15,7 @@ import {
   Avatar,
 } from '@mui/material';
 import { FileDownload, Source } from '@mui/icons-material';
-import { QUERY_FILES_KEY, api } from '../api';
+import { QUERY_FILES_KEY, api, baseUrl } from '../api';
 import { UploadedFile } from '../types';
 
 export type SharedSpaceUploadedFileListProps = {
@@ -29,20 +29,12 @@ export default function SharedSpaceUploadedFileList({
     QUERY_FILES_KEY,
     () => api.get('/file/list', { params: { sid } }).then(d => d.data),
     {
-      initialData: [
-        {
-          name: 'f1',
-          key: 'k1',
-          expire: Date.now() / 1000 + 15,
-        },
-      ],
+      initialData: [],
     },
   );
 
   if (isError) {
-    return (
-      <Typography color="error">Failed to load upload contents</Typography>
-    );
+    return <Typography color="error">Failed to load file contents</Typography>;
   }
   if (!data || !isFetched) {
     return (
@@ -55,13 +47,6 @@ export default function SharedSpaceUploadedFileList({
     );
   }
 
-  const onDownloadFile = (key: string) => {
-    api.get('/file/content', { params: { sid, key } }).then(d => {
-      const downloadUrl = d.data;
-      window.open(downloadUrl, 'blank');
-    });
-  };
-
   return (
     <List>
       {data.map(file => (
@@ -69,8 +54,11 @@ export default function SharedSpaceUploadedFileList({
           <ListItem
             divider
             secondaryAction={
-              <Tooltip title="Download Content">
-                <IconButton onClick={() => onDownloadFile(file.key)}>
+              <Tooltip title="View/Download Content">
+                <IconButton
+                  component="a"
+                  href={`${baseUrl}/file/retrieve/signed-url?sid=${sid}&key=${file.key}`}
+                  target="_blank">
                   <FileDownload color="action" />
                 </IconButton>
               </Tooltip>

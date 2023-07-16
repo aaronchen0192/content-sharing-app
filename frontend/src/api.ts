@@ -1,8 +1,10 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
+export const baseUrl =
+  'https://ee82mju52j.execute-api.us-east-1.amazonaws.com/Prod/';
+
 const axiosConfig: AxiosRequestConfig = {
-  //baseURL: 'http://127.0.0.1:4566',
-  baseURL: 'https://ee82mju52j.execute-api.us-east-1.amazonaws.com/Prod/',
+  baseURL: baseUrl,
   timeout: 20000,
   headers: {
     'Content-Type': 'application/json',
