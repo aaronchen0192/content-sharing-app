@@ -81,6 +81,7 @@ def lambda_handler(event, context):
     item = {
         'sid': sid,
         'file_key': key,
+        'name': file_name,
         'expire': str(expire_time)
     }
     

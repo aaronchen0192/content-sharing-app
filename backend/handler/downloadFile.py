@@ -50,24 +50,17 @@ def lambda_handler(event, context):
         params = {'Bucket': bucket_name, 'Key': s3_key}
         url = s3.generate_presigned_url('get_object', Params=params, ExpiresIn=3600)
     except ClientError as e:
-        pass
-        # return {
-        #     'statusCode': 404,
-        #     'body': 'client error'
-        # }
-
-    # Prepare the response
-    http_status_code = 200
+        return {
+            'statusCode': 404,
+            'body': 'Resource not found'
+        }
     
-    # Return the files as the response
     return {
-        'statusCode': http_status_code,
+        'statusCode': 302,
         "headers": {
             "Access-Control-Allow-Headers" : "Content-Type",
             "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET"
-        },
-        'body': {
-            'url': url
+            "Access-Control-Allow-Methods": "GET",
+            "Location": url,
         }
     }

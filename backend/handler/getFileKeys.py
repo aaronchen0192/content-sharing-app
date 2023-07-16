@@ -54,7 +54,8 @@ def lambda_handler(event, context):
     keys = []
     for item in items:
         keys.append({
-            'file_key': item['file_key'],
+            'name': item['name'],
+            'key': item['key'],
             'expire': int(item['expire'])
         })
     
