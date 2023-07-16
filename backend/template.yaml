@@ -67,7 +67,7 @@ Resources:
         PostText:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /upload
+            Path: /file
             Method: post
       Policies:
         - S3FullAccessPolicy:
@@ -85,7 +85,7 @@ Resources:
         GetText:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /upload
+            Path: /file/list
             Method: get
       Policies:
         - DynamoDBCrudPolicy:
@@ -103,7 +103,7 @@ Resources:
         GetText:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /fileContent
+            Path: /file
             Method: get
       Policies:
         - DynamoDBCrudPolicy:

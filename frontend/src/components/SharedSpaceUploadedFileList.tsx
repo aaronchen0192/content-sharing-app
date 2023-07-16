@@ -27,7 +27,7 @@ export default function SharedSpaceUploadedFileList({
 }: SharedSpaceUploadedFileListProps) {
   const { data, isFetched, isError } = useQuery<UploadedFile[]>(
     QUERY_FILES_KEY,
-    () => api.get('/upload', { params: { sid } }).then(d => d.data),
+    () => api.get('/file/list', { params: { sid } }).then(d => d.data),
     {
       initialData: [
         {
@@ -56,7 +56,7 @@ export default function SharedSpaceUploadedFileList({
   }
 
   const onDownloadFile = (key: string) => {
-    api.get('/fileContent', { params: { sid, key } }).then(d => {
+    api.get('/file', { params: { sid, key } }).then(d => {
       const downloadUrl = d.data;
       window.open(downloadUrl, 'blank');
     });

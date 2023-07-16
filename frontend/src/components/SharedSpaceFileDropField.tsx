@@ -35,7 +35,7 @@ export default function SharedSpaceFileDropField({
             },
           ]);
 
-          api.post('/upload', { params: { sid, key, file } }).then(d => {
+          api.post('/file', { params: { sid, key, file } }).then(d => {
             const expire = d.data as number;
             queryClient.setQueryData(QUERY_FILES_KEY, (fl?: UploadedFile[]) =>
               (fl ?? []).map(f =>
