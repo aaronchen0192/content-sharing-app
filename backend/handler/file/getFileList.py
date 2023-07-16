@@ -16,7 +16,7 @@ def lambda_handler(event, context):
     
     response = fileTable.query(KeyConditionExpression = Key('sid').eq(sid))
     
-    items = response['Responses'].get('SharedSpaceUploadTable', [])
+    items = response['Items']
     # if not items:
     #     return {
     #         'statusCode': 404,

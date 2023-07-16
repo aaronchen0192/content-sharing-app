@@ -22,7 +22,7 @@ Resources:
   GetTextFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: handler/
+      CodeUri: handler/text
       Handler: getText.lambda_handler
       Runtime: python3.9
       Architectures:
@@ -40,7 +40,7 @@ Resources:
   PostTextFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: handler/
+      CodeUri: handler/text
       Handler: postText.lambda_handler
       Runtime: python3.9
       Architectures:
@@ -58,8 +58,8 @@ Resources:
   UploadEventFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: handler/
-      Handler: uploadEvent.lambda_handler
+      CodeUri: handler/file
+      Handler: postFile.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
@@ -78,8 +78,8 @@ Resources:
   GetFileKeysFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: handler/
-      Handler: getFileKeys.lambda_handler
+      CodeUri: handler/file
+      Handler: getFileList.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
@@ -96,8 +96,8 @@ Resources:
   DownloadFileFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      CodeUri: handler/
-      Handler: downloadFile.lambda_handler
+      CodeUri: handler/file
+      Handler: getFile.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
