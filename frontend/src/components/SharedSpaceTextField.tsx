@@ -83,7 +83,7 @@ export default function SharedSpaceTextField({
   return (
     <Grow in>
       <TextField
-        label="Shared Text"
+        label="Type in anything to share!"
         helperText={
           isMutationLoading ? (
             'Saving...'
@@ -108,7 +108,7 @@ export default function SharedSpaceTextField({
           )
         }
         multiline
-        minRows={2}
+        minRows={4}
         maxRows={15}
         fullWidth
         value={debounceValue ?? data?.value ?? ''}

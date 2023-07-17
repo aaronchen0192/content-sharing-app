@@ -3,58 +3,47 @@ import {
   RouterProvider,
   Navigate,
 } from 'react-router-dom';
-import SharedSpace from './components/SharedSpace';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { queryClient } from './queryClient';
 import { QueryClientProvider } from 'react-query';
 import './index.css';
-
-const characters =
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-const generateId = () => {
-  let id = '';
-
-  for (let i = 0; i < 6; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    id += characters[randomIndex];
-  }
-
-  return id;
-};
+import Home from './pages/Home';
+import SharedSpace from './pages/SharedSpace';
+import CustomThemeProvider from './providers/CustomThemeProvider';
+import Layout from './components/Layout';
+import New from './pages/New';
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <Home />,
-  },
-  {
-    path: '/new',
-    element: <Navigate to={`/${generateId()}`} replace />,
-  },
-  {
-    path: '/:sid',
-    element: <SharedSpace />,
+    element: <Layout />,
+    children: [
+      {
+        path: '/',
+        element: <Home />,
+      },
+      {
+        path: '/new',
+        element: <New />,
+      },
+      {
+        path: '/:sid',
+        element: <SharedSpace />,
+      },
+    ],
   },
 ]);
 
 function App() {
   return (
     <>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-      <ToastContainer />
+      <CustomThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+        <ToastContainer />
+      </CustomThemeProvider>
     </>
-  );
-}
-
-function Home() {
-  return (
-    <div>
-      <h2>Hello World 2</h2>
-    </div>
   );
 }
 

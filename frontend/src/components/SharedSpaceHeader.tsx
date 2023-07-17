@@ -6,7 +6,6 @@ import { toast } from 'react-toastify';
 export default function SharedSpaceHeader() {
   return (
     <TextField
-      label="Share Space URL"
       InputProps={{
         endAdornment: (
           <IconButton

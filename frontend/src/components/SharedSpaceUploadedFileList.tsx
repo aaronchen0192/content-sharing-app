@@ -69,7 +69,7 @@ export default function SharedSpaceUploadedFileList({
               </Avatar>
             </ListItemAvatar>
             <ListItemText
-              primary={`Line item ${file.name}`}
+              primary={<Typography color="textPrimary">{file.name}</Typography>}
               secondary={
                 !file?.expire ? (
                   'Uploading...'
