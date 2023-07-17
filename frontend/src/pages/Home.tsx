@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  Grow,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Grow, Stack, TextField, Typography } from '@mui/material';
 import { NavLink } from 'react-router-dom';
 import React from 'react';
 import mainImage from '../assets/mainImage.png';
