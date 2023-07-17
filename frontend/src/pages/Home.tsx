@@ -19,10 +19,10 @@ export default function Home() {
           <Typography variant="h5" textAlign="center" color="primary">
             TL;DR just click <b>Enter Shared Space!</b>
           </Typography>
-          <Typography textAlign="center" maxWidth="600px" color="textPrimary">
+          <Typography textAlign="center" maxWidth="580px" color="textPrimary">
             Need to copy a link or file on a different device? Introducing{' '}
-            <b>SharedSpace</b>, enabling easy sharing and access to resources
-            across any device in just two clicks.
+            <b>SharedSpace</b>, enabling easy sharing and access to resources in
+            just two clicks.
           </Typography>
         </Stack>
 
