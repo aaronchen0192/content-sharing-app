@@ -148,6 +148,8 @@ export default function SharedSpaceTextField({
         onChange={e => {
           if (e.target.value.length < 10000) {
             setDebounceValue(e.target.value);
+          } else {
+            toast.error('Text reach limit 10000');
           }
         }}
       />
