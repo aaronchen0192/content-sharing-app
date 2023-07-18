@@ -1,4 +1,4 @@
-import { Grow, Skeleton, TextField, Typography } from '@mui/material';
+import { Grow, Skeleton, TextField, Typography, useTheme } from '@mui/material';
 import React from 'react';
 import Countdown from 'react-countdown';
 import { useMutation, useQuery } from 'react-query';
@@ -18,8 +18,9 @@ type SharedSpaceTextFieldProps = {
 export default function SharedSpaceTextField({
   sid,
 }: SharedSpaceTextFieldProps) {
-  const { data, isLoading, isError } = useQuery<TextContent>(
-    TEXT_QUERY_KEY,
+  const theme = useTheme();
+  const { data, isFetched, isError } = useQuery<TextContent>(
+    TEXT_QUERY_KEY(sid),
     () => api.get('/text', { params: { sid } }).then(d => d.data),
     {
       enabled: Boolean(sid),
@@ -39,7 +40,7 @@ export default function SharedSpaceTextField({
     if (debounceValue !== null) {
       const timeout = setTimeout(() => {
         queryClient.setQueryData(
-          TEXT_QUERY_KEY,
+          TEXT_QUERY_KEY(sid),
           (s: TextContent | undefined) => ({
             ...s,
             value: debounceValue,
@@ -49,7 +50,7 @@ export default function SharedSpaceTextField({
         mutateAsync(debounceValue, {
           onSuccess: expire => {
             queryClient.setQueryData(
-              TEXT_QUERY_KEY,
+              TEXT_QUERY_KEY(sid),
               (s: TextContent | undefined) => ({
                 ...s,
                 expire,
@@ -66,10 +67,10 @@ export default function SharedSpaceTextField({
         clearTimeout(timeout);
       };
     }
-  }, [debounceValue, mutateAsync]);
+  }, [debounceValue, mutateAsync, sid]);
 
-  if (isLoading) {
-    return <Skeleton variant="rounded" width="100%" height="80px" />;
+  if (!isFetched) {
+    return <Skeleton variant="rounded" width="100%" height="125px" />;
   }
 
   if (isError) {
@@ -83,7 +84,13 @@ export default function SharedSpaceTextField({
   return (
     <Grow in>
       <TextField
-        label="Type in anything to share!"
+        autoFocus
+        sx={{
+          '& .MuiInputBase-root': {
+            bgcolor: theme.palette.mode === 'dark' ? 'action.hover' : undefined,
+          },
+        }}
+        label="Type anything!"
         helperText={
           isMutationLoading ? (
             'Saving...'
@@ -92,7 +99,7 @@ export default function SharedSpaceTextField({
               Expired in:{' '}
               <Countdown
                 onComplete={() => {
-                  queryClient.setQueryData(TEXT_QUERY_KEY, defaultState);
+                  queryClient.setQueryData(TEXT_QUERY_KEY(sid), defaultState);
                   setDebounceValue(null);
                 }}
                 renderer={({ minutes, seconds }) => (

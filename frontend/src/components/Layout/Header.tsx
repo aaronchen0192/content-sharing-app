@@ -1,10 +1,11 @@
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { IconButton, styled } from '@mui/material';
+import { Box, IconButton, Stack, styled } from '@mui/material';
 import ThemeToggle from './ThemeToggle';
 import { NavLink } from 'react-router-dom';
 import { Home } from '@mui/icons-material';
+import logo from '../../assets/logo.png';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   background: theme.palette.primary.main,
@@ -22,13 +23,15 @@ export function Header() {
         <IconButton color="inherit" component={NavLink} to="/">
           <Home />
         </IconButton>
-        <Typography
-          fontSize="2rem"
-          color="inherit"
-          sx={{ display: { xs: 'none', sm: 'block' } }}
-          fontWeight={500}>
-          SharedSpace
-        </Typography>
+        <Stack direction="row" alignItems="center">
+          <Typography
+            fontSize={{ xs: '1.5rem', md: '2rem' }}
+            color="inherit"
+            fontWeight={500}>
+            SharedSpace
+          </Typography>
+          <Box component="img" width="50px" src={logo} />
+        </Stack>
 
         <ThemeToggle />
       </Toolbar>

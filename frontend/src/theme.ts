@@ -26,6 +26,9 @@ export const lightTheme: Theme = createTheme({
     primary: {
       main: '#009ba0',
     },
+    success: {
+      main: '#009ba0',
+    },
   },
   ...sharedTheme,
 });
@@ -34,6 +37,9 @@ export const darkTheme: Theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
+      main: '#009ba0',
+    },
+    success: {
       main: '#009ba0',
     },
   },

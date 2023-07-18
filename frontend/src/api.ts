@@ -13,6 +13,6 @@ const axiosConfig: AxiosRequestConfig = {
 
 export const api = axios.create(axiosConfig);
 
-export const QUERY_FILES_KEY = ['files'];
+export const QUERY_FILES_KEY = (sid?: string) => ['files', sid];
 
-export const TEXT_QUERY_KEY = ['text-content'];
+export const TEXT_QUERY_KEY = (sid?: string) => ['text-content', sid];

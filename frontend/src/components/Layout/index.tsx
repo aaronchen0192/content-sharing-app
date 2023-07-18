@@ -4,7 +4,7 @@ import { Box, Container } from '@mui/material';
 
 export default function Layout() {
   return (
-    <Box bgcolor="background.default" height="100%">
+    <Box bgcolor="background.default" minHeight="100%" pb={4}>
       <Header />
       <br />
       <Container maxWidth="md">

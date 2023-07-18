@@ -3,16 +3,15 @@ import { useQuery } from 'react-query';
 import { queryClient } from '../queryClient';
 import {
   Typography,
-  Stack,
   List,
   ListItemText,
-  Skeleton,
   Grow,
   ListItem,
   IconButton,
   Tooltip,
   ListItemAvatar,
   Avatar,
+  LinearProgress,
 } from '@mui/material';
 import { FileDownload, Source } from '@mui/icons-material';
 import { QUERY_FILES_KEY, api, baseUrl } from '../api';
@@ -26,7 +25,7 @@ export default function SharedSpaceUploadedFileList({
   sid,
 }: SharedSpaceUploadedFileListProps) {
   const { data, isFetched, isError } = useQuery<UploadedFile[]>(
-    QUERY_FILES_KEY,
+    QUERY_FILES_KEY(sid),
     () => api.get('/file/list', { params: { sid } }).then(d => d.data),
     {
       initialData: [],
@@ -37,20 +36,18 @@ export default function SharedSpaceUploadedFileList({
     return <Typography color="error">Failed to load file contents</Typography>;
   }
   if (!data || !isFetched) {
-    return (
-      <Stack mt={2} spacing={2}>
-        <Skeleton variant="rounded" height="35px" />
-        <Skeleton variant="rounded" height="35px" />
-        <Skeleton variant="rounded" height="35px" />
-        <Skeleton variant="rounded" height="35px" />
-      </Stack>
-    );
+    return <LinearProgress />;
   }
 
   return (
     <List>
-      {data.map(file => (
-        <Grow in key={file.key}>
+      {data.map((file, i) => (
+        <Grow
+          in
+          key={file.key}
+          timeout={{
+            enter: (i + 1) * 250,
+          }}>
           <ListItem
             divider
             secondaryAction={
@@ -80,7 +77,7 @@ export default function SharedSpaceUploadedFileList({
                       onComplete={() => {
                         const now = Date.now() / 1000;
                         queryClient.setQueryData(
-                          QUERY_FILES_KEY,
+                          QUERY_FILES_KEY(sid),
                           (fl?: UploadedFile[]) =>
                             fl?.filter(f => now <= (f.expire ?? 0)) ?? [],
                         );
