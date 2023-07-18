@@ -25,9 +25,6 @@ export default function SharedSpaceHeader({ sid }: SharedSpaceHeaderProps) {
                     });
                   } catch (ex) {
                     console.error(ex);
-                    toast.error('Shared Failed', {
-                      toastId: 'share',
-                    });
                   }
                 }}>
                 <Share />
@@ -40,9 +37,6 @@ export default function SharedSpaceHeader({ sid }: SharedSpaceHeaderProps) {
                     copyToClipboard(window.location.href);
                   } catch (ex) {
                     console.error(ex);
-                    toast.error('Copy Failed', {
-                      toastId: 'copy',
-                    });
                   }
                 }}>
                 <ContentCopy />
