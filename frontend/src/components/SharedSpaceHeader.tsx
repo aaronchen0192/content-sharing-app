@@ -1,7 +1,6 @@
 import { ContentCopy, Share } from '@mui/icons-material';
 import { TextField, IconButton, Tooltip } from '@mui/material';
 import copyToClipboard from 'copy-to-clipboard';
-import { toast } from 'react-toastify';
 
 type SharedSpaceHeaderProps = {
   sid?: string;
