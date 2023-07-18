@@ -1,28 +1,48 @@
 import json
 import boto3
 from boto3.dynamodb.conditions import Key
+from botocore.exceptions import ClientError
 
 dynamodb = boto3.resource('dynamodb')
 fileTable = dynamodb.Table('SharedSpaceFileTable')
 
 def lambda_handler(event, context):
 
-    # Retrieve the file key from DynamoDB
+    if 'queryStringParameters' not in event or not event['queryStringParameters']:    
+        return {
+            'statusCode': 422,
+            'body': 'Request parameter error'
+        }
     
+    # Retrieve the file key from DynamoDB
     query_params = event['queryStringParameters']
 
+    if 'sid' not in query_params:
+        return {
+            'statusCode': 422,
+            'body': 'Request parameter error'
+        }
+    
     sid = query_params['sid']
     
-    response = fileTable.query(
-        KeyConditionExpression = Key('sid').eq(sid)
-    )
+    try:
+        # find all entries for this sid
+        response = fileTable.query(
+            KeyConditionExpression = Key('sid').eq(sid)
+        )
+        
+    except ClientError as e:
+        return {
+            'statusCode': 400,
+            'body': 'Get data failed'
+        }
     
     items = response['Items']
-    # if not items:
-    #     return {
-    #         'statusCode': 404,
-    #         'body': 'sid not found in DynamoDB'
-    #     }
+    if not items:
+        return {
+            'statusCode': 404,
+            'body': 'sid not found in DynamoDB'
+        }
 
     keys = []
     for item in items:
@@ -32,7 +52,7 @@ def lambda_handler(event, context):
             'expire': int(item['expire'])
         })
     
-    # Return the files as the response
+    # frontend expects a list of {'name':string, 'key':string, 'expire':number}
     return {
         'statusCode': 200,
         'headers': {
