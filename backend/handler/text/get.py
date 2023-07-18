@@ -60,7 +60,7 @@ def lambda_handler(event, context):
     else:
         respond_payload = {'value':data['Item']['value'], 'expire':int(data['Item']['expire'])}
 
-    # front end excepts {'value':string, 'expire':number}
+    # front end expect {'value':string, 'expire':number}
     return {
         "statusCode": 200,
         "headers": {
