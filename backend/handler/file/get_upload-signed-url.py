@@ -1,12 +1,12 @@
 import json
 from datetime import datetime
-# import requests
 import boto3
 from botocore.exceptions import ClientError
 
 s3 = boto3.client('s3')
 
 def lambda_handler(event, context):
+
     query_params = event['queryStringParameters']
 
     sid = query_params['sid']
