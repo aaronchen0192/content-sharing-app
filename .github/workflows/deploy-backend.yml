@@ -1,37 +1,39 @@
 name: Deploy Backend Infrastructure
 
 on:
-    workflow_dispatch:
-    push:
-        branches:
-            - main
-        paths:
-            - backend/**
-
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - backend/**
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 permissions:
-    id-token: write
-    contents: read
+  id-token: write
+  contents: read
 
 jobs:
-    build-deploy:
-        runs-on: ubuntu-latest
-        defaults:
-            run:
-                working-directory: backend
-        steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-python@v2
-            - uses: aws-actions/setup-sam@v1
-            - uses: aws-actions/configure-aws-credentials@v1
-              with:
-                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: us-east-1
+  build-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: aws-actions/setup-sam@v1
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-            # sam build
-            - run: sam build --use-container
+      # sam build
+      - run: sam build --use-container
 
-            # Run Unit tests- Specify unit tests here
+      # Run Unit tests- Specify unit tests here
 
-            # sam deploy
-            - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+      # sam deploy
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
