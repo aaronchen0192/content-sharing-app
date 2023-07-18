@@ -5,6 +5,9 @@ import { QUERY_FILES_KEY, api } from '../api';
 import { uid } from 'uid';
 import { toast } from 'react-toastify';
 import { styled } from '@mui/material';
+import { useDropzone } from 'react-dropzone';
+import 'react-dropzone/examples/theme.css';
+import { useCallback } from 'react';
 
 type SharedSpaceFileDropFieldProps = {
   sid?: string;
@@ -20,8 +23,33 @@ const StyledFileUploaderContainer = styled('div')(({ theme }) => ({
 export default function SharedSpaceFileDropField({
   sid,
 }: SharedSpaceFileDropFieldProps) {
+  // const onDrop = useCallback(async (files: FileList) => {
+  //   for (const file of files) {
+  //     const key = uid(16);
+
+  //     // create initial file content as loading status
+  //     queryClient.setQueryData(QUERY_FILES_KEY, (fl?: UploadedFile[]) => [
+  //       ...(fl ?? []),
+  //       {
+  //         name: file.name,
+  //         key,
+  //       },
+  //     ]);
+  //   }
+  // }, []);
+
+  // const { getRootProps, getInputProps } = useDropzone({
+  //   maxFiles: 5,
+  //   multiple: true,
+  //   onDrop,
+  // });
+
   return (
     <StyledFileUploaderContainer>
+      {/* <div {...getRootProps({ className: 'dropzone' })}>
+        <input {...getInputProps()} />
+        <p>Drag 'n' drop some files here, or click to select files</p>
+      </div> */}
       <FileUploader
         maxSize={15}
         classes="file-uploader"
