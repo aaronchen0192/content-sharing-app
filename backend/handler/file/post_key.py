@@ -11,10 +11,31 @@ BYTES_LIMIT = 15 * 1024 * 1024
 
 def lambda_handler(event, context):
  
+    if 'queryStringParameters' not in event or not event['queryStringParameters'] or 'body' not in event or not event['body']:    
+        return {
+            'statusCode': 422,
+            'body': 'Request parameter error'
+        }
+     
     query_params = event['queryStringParameters']
+
+    if 'sid' not in query_params or 'key' not in query_params:
+        return {
+            'statusCode': 422,
+            'body': 'Request parameter error'
+        }
+    
     sid = query_params['sid']
     key = query_params['key']
     
+    # check illegal characters in key?
+    if '/' in key:
+        return {
+            'statusCode': 400,
+            'body': 'Request parameter error'
+        }
+
+    # event['body'] is checked at the top
     fileName = json.loads(event['body'])
 
     s3_key = f'{sid}/{key}'  # Specify the desired prefix for the S3 object key
@@ -41,6 +62,7 @@ def lambda_handler(event, context):
         }
     
     # Return a success response
+    # front end expect number
     return {
         'statusCode': 200,
         'headers': {
