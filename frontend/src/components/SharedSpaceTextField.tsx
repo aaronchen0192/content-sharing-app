@@ -1,4 +1,12 @@
-import { Grow, Skeleton, TextField, Typography, useTheme } from '@mui/material';
+import {
+  Grow,
+  IconButton,
+  Skeleton,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import React from 'react';
 import Countdown from 'react-countdown';
 import { useMutation, useQuery } from 'react-query';
@@ -6,6 +14,8 @@ import { TEXT_QUERY_KEY, api } from '../api';
 import { queryClient } from '../queryClient';
 import { toast } from 'react-toastify';
 import { TextContent } from '../types';
+import copyToClipboard from 'copy-to-clipboard';
+import { ContentCopy } from '@mui/icons-material';
 
 const defaultState: TextContent = {
   value: '',
@@ -119,6 +129,22 @@ export default function SharedSpaceTextField({
         maxRows={15}
         fullWidth
         value={debounceValue ?? data?.value ?? ''}
+        InputProps={{
+          endAdornment: (
+            <Tooltip title="Copy">
+              <IconButton
+                onClick={async () => {
+                  try {
+                    copyToClipboard(debounceValue ?? '');
+                  } catch (ex) {
+                    console.error(ex);
+                  }
+                }}>
+                <ContentCopy />
+              </IconButton>
+            </Tooltip>
+          ),
+        }}
         onChange={e => {
           if (e.target.value.length < 10000) {
             setDebounceValue(e.target.value);
