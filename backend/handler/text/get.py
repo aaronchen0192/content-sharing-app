@@ -9,12 +9,6 @@ textTable = dynamodb.Table('SharedSpaceTextTable')
 
 def lambda_handler(event, context):
 
-    if 'queryStringParameters' not in event or not event['queryStringParameters']:    
-        return {
-            'statusCode': 422,
-            'body': 'Request parameter error'
-        }
-
     # get the dictionary for request parameter
     query_params = event['queryStringParameters']
 

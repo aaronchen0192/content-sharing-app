@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 import boto3
 from botocore.exceptions import ClientError
@@ -9,6 +8,12 @@ def lambda_handler(event, context):
 
     query_params = event['queryStringParameters']
 
+    if 'sid' not in query_params or 'key' not in query_params or 'fileType' not in query_params:
+        return {
+            'statusCode': 422,
+            'body': 'Request parameter error'
+        }
+        
     sid = query_params['sid']
     key = query_params['key']
     fileType = query_params['fileType']

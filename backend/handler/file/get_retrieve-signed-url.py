@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 # import requests
 import boto3
@@ -8,12 +7,7 @@ s3 = boto3.client('s3')
 
 def lambda_handler(event, context):
 
-    if 'queryStringParameters' not in event or not event['queryStringParameters']:    
-        return {
-            'statusCode': 422,
-            'body': 'Request parameter error'
-        }
-    
+
     query_params = event['queryStringParameters']
 
     if 'sid' not in query_params or 'key' not in query_params:

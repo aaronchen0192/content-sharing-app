@@ -8,13 +8,15 @@ textTable = dynamodb.Table('SharedSpaceTextTable')
 
 def lambda_handler(event, context):
 
-    if 'queryStringParameters' not in event or not event['queryStringParameters'] or 'body' not in event or not event['body']:    
+    query_params = event['queryStringParameters']
+    
+    if 'sid' not in query_params :
         return {
             'statusCode': 422,
             'body': 'Request parameter error'
         }
-    
-    query_params = event['queryStringParameters']
+        
+    sid = query_params['sid']
     text = json.loads(event['body'])
 
     text_limit = 10000
@@ -23,14 +25,6 @@ def lambda_handler(event, context):
             'statusCode': 400,
             'body': 'Text reach limit'
         }
-
-    if 'sid' not in query_params :
-        return {
-            'statusCode': 422,
-            'body': 'Request parameter error'
-        }
-    
-    sid = query_params['sid']
 
     # 15 min
     expire_time = 60*15 + int(time.time()) 

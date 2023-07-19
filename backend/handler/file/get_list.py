@@ -38,11 +38,6 @@ def lambda_handler(event, context):
         }
     
     items = response['Items']
-    if not items:
-        return {
-            'statusCode': 404,
-            'body': 'sid not found in DynamoDB'
-        }
 
     keys = []
     for item in items:
