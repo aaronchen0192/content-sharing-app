@@ -1,6 +1,6 @@
 import { ContentCopy, Share } from '@mui/icons-material';
 import { TextField, IconButton, Tooltip } from '@mui/material';
-import copyToClipboard from 'copy-to-clipboard';
+import CopyButton from './CopyButton';
 
 type SharedSpaceHeaderProps = {
   sid?: string;
@@ -29,18 +29,9 @@ export default function SharedSpaceHeader({ sid }: SharedSpaceHeaderProps) {
                 <Share />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Copy">
-              <IconButton
-                onClick={async () => {
-                  try {
-                    copyToClipboard(window.location.href);
-                  } catch (ex) {
-                    console.error(ex);
-                  }
-                }}>
-                <ContentCopy />
-              </IconButton>
-            </Tooltip>
+            <CopyButton copyValue={window.location.href}>
+              <ContentCopy />
+            </CopyButton>
           </>
         ),
       }}

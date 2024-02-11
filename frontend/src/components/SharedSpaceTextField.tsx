@@ -1,9 +1,11 @@
 import {
+  FormControl,
+  FormHelperText,
   Grow,
-  IconButton,
+  InputLabel,
+  OutlinedInput,
+  Paper,
   Skeleton,
-  TextField,
-  Tooltip,
   Typography,
   useTheme,
 } from '@mui/material';
@@ -14,8 +16,8 @@ import { TEXT_QUERY_KEY, api } from '../api';
 import { queryClient } from '../queryClient';
 import { toast } from 'react-toastify';
 import { TextContent } from '../types';
-import copyToClipboard from 'copy-to-clipboard';
 import { ContentCopy } from '@mui/icons-material';
+import CopyButton from './CopyButton';
 
 const defaultState: TextContent = {
   value: '',
@@ -91,18 +93,47 @@ export default function SharedSpaceTextField({
     );
   }
 
+  const label = 'Type anything here to share!';
   return (
     <Grow in>
-      <TextField
-        autoFocus
-        sx={{
-          '& .MuiInputBase-root': {
-            bgcolor: theme.palette.mode === 'dark' ? 'action.hover' : undefined,
-          },
-        }}
-        label="Type anything!"
-        helperText={
-          isMutationLoading ? (
+      <FormControl variant="outlined" fullWidth>
+        <Paper elevation={2}>
+          <InputLabel htmlFor="my-input">{label}</InputLabel>
+          <OutlinedInput
+            sx={{
+              '& .MuiInputBase-root': {
+                bgcolor:
+                  theme.palette.mode === 'dark' ? 'action.hover' : undefined,
+              },
+            }}
+            label={label}
+            multiline
+            minRows={5}
+            maxRows={15}
+            fullWidth
+            autoFocus
+            id="my-input"
+            aria-describedby="my-helper-text"
+            value={debounceValue ?? data?.value ?? ''}
+            endAdornment={
+              <CopyButton
+                sx={{ alignSelf: 'flex-end' }}
+                size="small"
+                copyValue={debounceValue ?? data?.value ?? ''}>
+                <ContentCopy />
+              </CopyButton>
+            }
+            onChange={e => {
+              if (e.target.value.length < 10000) {
+                setDebounceValue(e.target.value);
+              } else {
+                toast.error('Text reach limit 10000');
+              }
+            }}
+          />
+        </Paper>
+        <FormHelperText id="my-helper-text">
+          {isMutationLoading ? (
             'Saving...'
           ) : data?.expire ? (
             <span>
@@ -122,37 +153,9 @@ export default function SharedSpaceTextField({
             </span>
           ) : (
             ''
-          )
-        }
-        multiline
-        minRows={4}
-        maxRows={15}
-        fullWidth
-        value={debounceValue ?? data?.value ?? ''}
-        InputProps={{
-          endAdornment: (
-            <Tooltip title="Copy">
-              <IconButton
-                onClick={async () => {
-                  try {
-                    copyToClipboard(debounceValue ?? '');
-                  } catch (ex) {
-                    console.error(ex);
-                  }
-                }}>
-                <ContentCopy />
-              </IconButton>
-            </Tooltip>
-          ),
-        }}
-        onChange={e => {
-          if (e.target.value.length < 10000) {
-            setDebounceValue(e.target.value);
-          } else {
-            toast.error('Text reach limit 10000');
-          }
-        }}
-      />
+          )}
+        </FormHelperText>
+      </FormControl>
     </Grow>
   );
 }

@@ -1,7 +1,15 @@
-import { Box, Button, Grow, Stack, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grow,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { NavLink } from 'react-router-dom';
 import React from 'react';
-import mainImage from '../assets/mainImage.png';
+import mainImage from '../assets/3dlogo.png';
 
 export default function Home() {
   const [sid, setSid] = React.useState('');
@@ -13,25 +21,36 @@ export default function Home() {
         width="100%"
         height="100%"
         alignItems="center"
-        spacing={{ xs: 4, md: 6 }}>
-        <Box component={'img'} maxWidth="250px" src={mainImage} />
-        <Stack spacing={2}>
-          <Typography variant="h5" textAlign="center" color="primary">
-            TL;DR just click <b>Enter Shared Space!</b>
-          </Typography>
-          <Typography textAlign="center" maxWidth="580px" color="textPrimary">
-            Need to copy a link or file on a different device? Introducing{' '}
-            <b>SharedSpace</b>, enabling easy sharing and access to resources in
-            just two clicks.
-          </Typography>
-        </Stack>
-
-        <TextField
-          label="Space ID (Optional)"
-          onChange={e => {
-            setSid(e.target.value);
+        spacing={4}>
+        <Box
+          component={'img'}
+          maxWidth={{
+            xs: '150px',
+            md: '250px',
           }}
+          src={mainImage}
         />
+        <Typography
+          typography={{ xs: 'h4', md: 'h3' }}
+          textAlign="center"
+          color="textPrimary">
+          TL;DR just click <br />
+          Enter<b> Shared Space!</b>
+        </Typography>
+        <Typography textAlign="center" maxWidth="580px" color="textPrimary">
+          Need to copy a link or file on a different device? Introducing{' '}
+          <b>SharedSpace</b>, enabling easy sharing and access to resources in
+          just two clicks.
+        </Typography>
+
+        <Paper>
+          <TextField
+            label="Space ID (Optional)"
+            onChange={e => {
+              setSid(e.target.value);
+            }}
+          />
+        </Paper>
         <Button
           component={NavLink}
           to={sid ? `${sid}` : '/new'}

@@ -40,7 +40,7 @@ export default function SharedSpaceUploadedFileList({
   }
 
   return (
-    <List>
+    <List sx={{ p: 0 }}>
       {data.map((file, i) => (
         <Grow
           in

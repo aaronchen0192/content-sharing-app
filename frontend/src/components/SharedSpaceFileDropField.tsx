@@ -13,8 +13,6 @@ type SharedSpaceFileDropFieldProps = {
   sid?: string;
 };
 
-const MAX_FILE_SIZE = 15 * 1024 * 1024;
-
 export default function SharedSpaceFileDropField({
   sid,
 }: SharedSpaceFileDropFieldProps) {
@@ -22,11 +20,6 @@ export default function SharedSpaceFileDropField({
     async (files: File[]) => {
       if (files.length > 5) {
         toast.error('Cannot upload more than 5 files at once');
-        return;
-      }
-
-      if (files.some(f => f.size > MAX_FILE_SIZE)) {
-        toast.error('Each file cannot exceed 15 megabytes');
         return;
       }
 
@@ -118,6 +111,13 @@ export default function SharedSpaceFileDropField({
       borderColor={
         isDragReject ? 'error.main' : isActive ? 'primary.main' : undefined
       }
+      color={
+        isDragReject
+          ? 'error.main'
+          : isActive
+          ? 'primary.main'
+          : 'text.secondary'
+      }
       {...getRootProps({ className: 'dropzone' })}>
       <input {...getInputProps()} />
       {isDragReject ? (
@@ -131,7 +131,7 @@ export default function SharedSpaceFileDropField({
             color={isActive ? 'primary' : undefined}
           />
           <Typography align="center" color={isActive ? 'primary' : undefined}>
-            Drag 'n' drop some files here, or click to select files (max 15 MB)
+            Drag 'n' drop some files here, or click to select files
           </Typography>
         </>
       )}
