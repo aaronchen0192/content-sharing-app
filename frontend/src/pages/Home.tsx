@@ -7,13 +7,15 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import React from 'react';
 import mainImage from '../assets/3dlogo.png';
 
 export default function Home() {
   const [sid, setSid] = React.useState('');
+  const navigate = useNavigate();
 
+  const sharedSpaceLink = sid ? `${sid}` : '/new';
   return (
     <Grow in>
       <Stack
@@ -49,7 +51,15 @@ export default function Home() {
 
         <Paper>
           <TextField
+            inputProps={{
+              inputMode: 'search',
+            }}
             label="Space ID (Optional)"
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                navigate(sharedSpaceLink);
+              }
+            }}
             onChange={e => {
               setSid(e.target.value);
             }}
@@ -57,7 +67,7 @@ export default function Home() {
         </Paper>
         <Button
           component={NavLink}
-          to={sid ? `${sid}` : '/new'}
+          to={sharedSpaceLink}
           sx={{
             px: {
               xs: 4,
