@@ -28,6 +28,10 @@ export default function Home() {
             xs: '150px',
             md: '250px',
           }}
+          minHeight={{
+            xs: '161px',
+            md: '270px',
+          }}
           src={mainImage}
         />
         <Typography

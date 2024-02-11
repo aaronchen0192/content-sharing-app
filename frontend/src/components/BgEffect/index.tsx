@@ -20,6 +20,7 @@ const BgEffect = () => {
             sunGlareColor: '#121212',
             sunlightColor: '#121212',
           };
+
     const vantaEffect = Effect({
       el: '#animated-bg',
       mouseControls: true,
@@ -28,7 +29,6 @@ const BgEffect = () => {
       speed: 1.25,
       ...opts,
     });
-    console.log(vantaEffect);
 
     return () => {
       vantaEffect.destroy();
